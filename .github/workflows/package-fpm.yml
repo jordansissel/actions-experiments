@@ -19,6 +19,7 @@ jobs:
         with:
           name: ruby-${{ matrix.ruby_version }}.tar
           # https://github.com/jordansissel/actions-experiments/actions/runs/16853055726
+          github-token: ${{ github.token }}
           run-id: 16853055726
 
       - name: Extract Ruby
