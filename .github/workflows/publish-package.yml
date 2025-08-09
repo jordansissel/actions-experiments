@@ -37,7 +37,7 @@ jobs:
 
       - name: Sign debs
         env:
-          KEY_ID: ${{ .vars.KEY_ID }}
+          KEY_ID: ${{ vars.KEY_ID }}
         run: |
           find artifacts -type f -name '*.deb' -print0 | \
             xargs -0t debsigs -v --gpgopts="--batch --no-tty --pinentry-mode=loopback" --sign=origin --default-key="$KEY_ID" 
