@@ -47,7 +47,7 @@ jobs:
           export PATH="/opt/ruby/${{ matrix.ruby_version }}/bin:${PATH}"
 
           outdir="build/${{ matrix.os }}"
-          mdkir -p "${outdir}"
+          mkdir -p "${outdir}"
 
           # Ruby requires libyaml, zlib, libcrypt, and libgmp
           # fpm requires binutils for `ar`
