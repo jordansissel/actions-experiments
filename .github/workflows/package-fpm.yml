@@ -25,7 +25,7 @@ jobs:
       - name: Extract Ruby
         run: |
           echo "Unpacking ruby ${{ matrix.ruby_version }} into /"
-          sudo tar -C / -xvf ruby-${{ matrix.ruby_version }}.tar
+          sudo tar -C / -xf ruby-${{ matrix.ruby_version }}.tar
           rm ruby-${{ matrix.ruby_version }}.tar
 
       - name: Install FPM
