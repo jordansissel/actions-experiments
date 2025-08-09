@@ -70,7 +70,7 @@ jobs:
           path: ${{ steps.package.outputs.outdir }}
 
   publish:
-    need: [ package ]
+    needs: [ package ]
     uses: ./.github/workflows/publish-package.yml
     permissions:
       contents: write
