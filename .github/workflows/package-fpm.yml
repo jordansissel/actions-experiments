@@ -18,8 +18,8 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ruby-${{ matrix.ruby_version }}.tar
-          # https://github.com/jordansissel/actions-experiments/actions/runs/16853055726
           github-token: ${{ github.token }}
+          # https://github.com/jordansissel/actions-experiments/actions/runs/16853055726
           run-id: 16853055726
 
       - name: Extract Ruby
@@ -40,9 +40,9 @@ jobs:
           (
             echo "#!/bin/sh"
             echo "exec /opt/ruby/${{ matrix.ruby_version }}/bin/fpm \"\$@\""
-          ) > /usr/bin/fpm
+          ) > fpm.sh
 
-          chmod 755 /usr/bin/fpm
+          chmod 755 fpm.sh
 
           # Ruby requires libyaml, zlib, libcrypt, and libgmp
           # fpm requires binutils for `ar`
@@ -54,7 +54,7 @@ jobs:
             --depends libcrypt1 \
             --depends libgmp10 \
             --depends binutils \
-            /opt/ruby/${{ matrix.ruby_version }}/ /usr/bin/fpm
+            /opt/ruby/${{ matrix.ruby_version }}/ fpm.sh=/usr/bin/fpm
 
           echo "filename=$(ls *.deb)" >> $GITHUB_OUTPUT
       
