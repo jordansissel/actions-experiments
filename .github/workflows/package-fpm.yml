@@ -70,4 +70,4 @@ jobs:
           path: ${{ steps.package.outputs.outdir }}
 
   publish:
-    uses: ./.github/actions/publish-package.yml
+    uses: ./.github/workflows/publish-package.yml
