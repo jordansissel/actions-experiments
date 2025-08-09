@@ -47,7 +47,8 @@ jobs:
           find artifacts -type f -name '*.deb' -print0 | \
             xargs -0tn1 sh -c 'reprepro -Vb repo includedeb any "$1"' -
 
-      -name: Commit and push
+      - name: Commit and push
+        run: |
           # Need to set git user and email
           # Citation> https://github.com/actions/checkout?tab=readme-ov-file#push-a-commit-using-the-built-in-token
           git config user.name "github-actions[bot]"
