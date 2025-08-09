@@ -68,3 +68,6 @@ jobs:
         with:
           name: package-${{ matrix.os }}
           path: ${{ steps.package.outputs.outdir }}
+
+  publish:
+    uses: ./.github/workflows/publish-packages.yml
