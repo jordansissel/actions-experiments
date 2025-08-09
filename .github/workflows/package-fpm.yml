@@ -1,0 +1,62 @@
+name: Package FPM
+
+on:
+  workflow_dispatch:
+
+jobs:
+  package:
+    strategy:
+      matrix:
+        version: [ 1.16.0 ]
+        ruby_version: [ "3.4.5" ] 
+        os: [ "ubuntu-latest" ]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Download Ruby
+        uses: actions/download-artifact@v4
+        with:
+          name: ruby-${{ matrix.ruby_version }}.tar
+
+      - name: Extract Ruby
+        run: |
+          echo "Unpacking ruby ${{ matrix.ruby_version }} into /"
+          sudo tar -C / -xvf ruby-${{ matrix.ruby_version }}.tar
+          rm ruby-${{ matrix.ruby_version }}.tar
+
+      - name: Install FPM
+        run: |
+          export PATH="/opt/ruby/${{ matrix.ruby_version }}/bin:${PATH}"
+          gem install fpm -v ${{ matrix.version }} --no-document
+
+      - name: Package
+        id: package
+        run: |
+          # Create an entrypoint
+          (
+            echo "#!/bin/sh"
+            echo "exec /opt/ruby/${{ matrix.ruby_version }}/bin/fpm \"\$@\""
+          ) > /usr/bin/fpm
+
+          chmod 755 /usr/bin/fpm
+
+          # Ruby requires libyaml, zlib, libcrypt, and libgmp
+          # fpm requires binutils for `ar`
+          FPM_VERSION="$(fpm --version)"
+          fpm -s dir -t deb \
+            -n fpm -v "${{ matrix.version }}" \
+            --depends libyaml-0-2 \
+            --depends zlib1g \
+            --depends libcrypt1 \
+            --depends libgmp10 \
+            --depends binutils \
+            /opt/ruby/${{ matrix.ruby_version }}/ /usr/bin/fpm
+
+          echo "filename=$(ls *.deb)" >> $GITHUB_OUTPUT
+      
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{matrix.os}}/${{ steps.package.outputs.filename }}
+          path: ${{ steps.package.outputs.filename }}
