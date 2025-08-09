@@ -1,0 +1,13 @@
+name: Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        required: true
+        type: number
+  workflow_call:
+    inputs:
+      run_id:
+        required: true
+        type: number
