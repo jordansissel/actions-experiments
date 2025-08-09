@@ -45,7 +45,7 @@ jobs:
         id: cache-ruby-install
         uses: actions/cache@v4
         with:
-          path: /opt/ruby-${{ env.RUBY_VERSION }}
+          path: /opt/ruby/${{ env.RUBY_VERSION }}
           key: ${{ runner.os }}-ruby-install-${{ env.RUBY_VERSION }}
 
       - name: Install ruby ${{ env.RUBY_VERSION }}
