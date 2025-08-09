@@ -28,8 +28,8 @@ jobs:
 
       - name: Setup GPG
         env:
-          GPG_PRIVATE_KEY: ${{ .secrets.GPG_PRIVATE_KEY }}
-          KEY_ID: ${{ .vars.KEY_ID }}
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          KEY_ID: ${{ vars.KEY_ID }}
         run: |
           echo "::add-mask::$GPG_PRIVATE_KEY"
           echo "$GPG_PRIVATE_KEY" | gpg --batch --import
