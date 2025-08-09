@@ -2,15 +2,15 @@ name: Publish
 
 on:
   workflow_dispatch:
-    inputs:
-      run_id:
-        required: true
-        type: number
+    #inputs:
+      #run_id:
+        #required: true
+        #type: number
   workflow_call:
-    inputs:
-      run_id:
-        required: true
-        type: number
+    #inputs:
+      #run_id:
+        #required: true
+        #type: number
 
 jobs:
   publish:
@@ -28,9 +28,9 @@ jobs:
 
       - name: Download Artifacts
         uses: actions/download-artifact@v4
-        with:
-          github-token: ${{ github.token }}
-          run-id: ${{ inputs.run_id }}
+        #with:
+          #github-token: ${{ github.token }}
+          #run-id: ${{ inputs.run_id }}
 
       - name: Explore
         run: |
