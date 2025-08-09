@@ -51,7 +51,7 @@ jobs:
       - name: Install ruby ${{ env.RUBY_VERSION }}
         if: steps.cache-ruby-install.outputs.cache-hit != 'true'
         run: |
-          sudo env PATH="/opt/ruby-build/bin:$PATH" ruby-build $${ env.RUBY_VERSION }} /opt/ruby/${{ env.RUBY_VERSION }}
+          sudo env PATH="/opt/ruby-build/bin:$PATH" ruby-build ${{ env.RUBY_VERSION }} /opt/ruby/${{ env.RUBY_VERSION }}
 
       - name: Test ruby ${{ env.RUBY_VERSION }}
         run: |
