@@ -1,7 +1,24 @@
-name: Build Ruby
+name: Build Packages
 
 on:
   workflow_dispatch:
+    inputs:
+      ruby_version:
+        description: "The version of ruby to build"
+        default: "3.4.5"
+        type: string
+      ruby_build_version:
+        description: "The version of ruby-build to use"
+        default: "20250724"
+        type: string
+  workflow_call:
+    inputs:
+      ruby_version:
+        required: true
+        type: string
+      ruby_build_version:
+        default: "20250724"
+        type: string
 
 env:
   RUBY_VERSION: "3.4.5"
@@ -12,7 +29,6 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      packages: write
       contents: read
 
     steps:
@@ -24,53 +40,53 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /opt/ruby-build
-          key: ${{ runner.os }}-ruby-build-${{ env.RUBY_BUILD_VERSION }}
+          key: ${{ runner.os }}-ruby-build-${{ inputs.ruby_build_version }}
 
-      - name: Install ruby-build ${{ env.RUBY_BUILD_VERSION }}
+      - name: Install ruby-build ${{ inputs.ruby_build_version }}
         if: steps.cache-ruby-build.outputs.cache-hit != 'true'
         run: |
           sudo apt-get update
           sudo apt-get install -y curl
-          curl -Lo ruby-build-v${{ env.RUBY_BUILD_VERSION }}.tar.gz https://github.com/rbenv/ruby-build/archive/refs/tags/v${{ env.RUBY_BUILD_VERSION }}.tar.gz
-          tar -zxf ruby-build-v${{ env.RUBY_BUILD_VERSION }}.tar.gz
-          sudo env PREFIX=/opt/ruby-build sh -x ./ruby-build-${{ env.RUBY_BUILD_VERSION }}/install.sh
-          rm ruby-build-v${{ env.RUBY_BUILD_VERSION }}.tar.gz
-          rm -r ruby-build-${{ env.RUBY_BUILD_VERSION }}/
+          curl -Lo ruby-build-v${{ inputs.ruby_build_version }}.tar.gz https://github.com/rbenv/ruby-build/archive/refs/tags/v${{ inputs.ruby_build_version }}.tar.gz
+          tar -zxf ruby-build-v${{ inputs.ruby_build_version }}.tar.gz
+          sudo env PREFIX=/opt/ruby-build sh -x ./ruby-build-${{ inputs.ruby_build_version }}/install.sh
+          rm ruby-build-v${{ inputs.ruby_build_version }}.tar.gz
+          rm -r ruby-build-${{ inputs.ruby_build_version }}/
 
       - name: Cache ruby install
         id: cache-ruby-install
         uses: actions/cache@v4
         with:
-          path: /opt/ruby/${{ env.RUBY_VERSION }}
-          key: ${{ runner.os }}-ruby-install-${{ env.RUBY_VERSION }}
+          path: /opt/ruby/${{ inputs.ruby_version }}
+          key: ${{ runner.os }}-ruby-install-${{ inputs.ruby_version }}
 
       - name: Install ruby-build dependencies
         if: steps.cache-ruby-install.outputs.cache-hit != 'true'
         run: |
           sudo apt-get install -y build-essential autoconf libssl-dev libyaml-dev zlib1g-dev libffi-dev libgmp-dev rustc
         
-      - name: Install ruby ${{ env.RUBY_VERSION }}
+      - name: Install ruby ${{ inputs.ruby_version }}
         if: steps.cache-ruby-install.outputs.cache-hit != 'true'
         run: |
-          sudo env PATH="/opt/ruby-build/bin:$PATH" ruby-build ${{ env.RUBY_VERSION }} /opt/ruby/${{ env.RUBY_VERSION }}
+          sudo env PATH="/opt/ruby-build/bin:$PATH" ruby-build ${{ inputs.ruby_version }} /opt/ruby/${{ inputs.ruby_version }}
 
-      - name: Test ruby ${{ env.RUBY_VERSION }}
+      - name: Test ruby ${{ inputs.ruby_version }}
         run: |
-          /opt/ruby/${{ env.RUBY_VERSION }}/bin/ruby --version
+          /opt/ruby/${{ inputs.ruby_version }}/bin/ruby --version
 
       # Github Actions Artifacts don't maintain permissions, so we need to pack
       # it up into a format that does maintain it.
       # Citation: https://github.com/actions/upload-artifact?tab=readme-ov-file#permission-loss
       # > File permissions are not maintained during artifact upload
       # > If you must preserve permissions, you can tar all of your files together before artifact upload
-      - name: Create archive of ruby ${{ env.RUBY_VERSION }}
-        run: tar -cf ruby-${{ env.RUBY_VERSION }}.tar /opt/ruby/${{ env.RUBY_VERSION }}
+      - name: Create archive of ruby ${{ inputs.ruby_version }}
+        run: tar -cf ruby-${{ inputs.ruby_version }}.tar /opt/ruby/${{ inputs.ruby_version }}
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ruby-${{ env.RUBY_VERSION }}.tar
-          path: ruby-${{ env.RUBY_VERSION }}.tar
+          name: ruby-${{ inputs.ruby_version }}.tar
+          path: ruby-${{ inputs.ruby_version }}.tar
 
   ruby-try:
     runs-on: ubuntu-latest
@@ -80,15 +96,15 @@ jobs:
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
-          name: ruby-${{ env.RUBY_VERSION }}.tar
+          name: ruby-${{ inputs.ruby_version }}.tar
 
       - name: Extract
         run: |
-          echo "Unpacking ruby ${{ env.RUBY_VERSION }} into /"
-          sudo tar -C / -xvf ruby-${{ env.RUBY_VERSION }}.tar
-          rm ruby-${{ env.RUBY_VERSION }}.tar
+          echo "Unpacking ruby ${{ inputs.ruby_version }} into /"
+          sudo tar -C / -xvf ruby-${{ inputs.ruby_version }}.tar
+          rm ruby-${{ inputs.ruby_version }}.tar
 
       - name: Try Ruby
         run: |
-          /opt/ruby/${{ env.RUBY_VERSION }}/bin/ruby --version
-          /opt/ruby/${{ env.RUBY_VERSION }}/bin/ruby -e 'puts "Hello world"'
+          /opt/ruby/${{ inputs.ruby_version }}/bin/ruby --version
+          /opt/ruby/${{ inputs.ruby_version }}/bin/ruby -e 'puts "Hello world"'
