@@ -84,6 +84,7 @@ jobs:
 
       - name: Extract
         run: |
+          ls -lR
           sudo tar -C / -xvf ruby-${{ env.RUBY_VERSION }}.tar
           rm ruby-${{ env.RUBY_VERSION }}.tar
 
