@@ -1,0 +1,58 @@
+name: Build Ruby
+
+on:
+  workflow_dispatch:
+
+env:
+  RUBY_VERSION: "3.4.5"
+  RUBY_BUILD_VERSION: "20250724"
+
+jobs:
+  ruby-build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      packages: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Cache ruby-build
+        id: cache-ruby-build
+        uses: actions/cache@v4
+        with:
+          path: /opt/ruby-build
+          key: ${{ runner.os }}-ruby-build-${{ env.RUBY_BUILD_VERSION }}
+
+      - name: Install ruby-build ${{ env.RUBY_BUILD_VERSION }}
+        if: steps.cache-ruby-build.outputs.cache-hit != 'true'
+        run: |
+          apt-get update
+          apt-get install -y curl
+          curl -Lo ruby-build-v${{ env.RUBY_BUILD_VERSION }}.tar.gz https://github.com/rbenv/ruby-build/archive/refs/tags/v${{ env.RUBY_BUILD_VERSION }}.tar.gz
+          tar -zxf ruby-build-v${{ env.RUBY_BUILD_VERSION }}.tar.gz
+          PREFIX=/opt/ruby-build sh -x ./ruby-build-${{ env.RUBY_BUILD_VERSION }}/install.sh
+          rm /tmp/ruby-build-v${{ env.RUBY_BUILD_VERSION }}.tar.gz
+          rm -r /tmp/ruby-build-${{ env.RUBY_BUILD_VERSION }}/
+
+      - name: Install ruby-build dependencies
+        run: |
+          apt-get install -y build-essential autoconf libssl-dev libyaml-dev zlib1g-dev libffi-dev libgmp-dev rustc
+        
+      - name: Cache ruby install
+        id: cache-ruby-install
+        uses: actions/cache@v4
+        with:
+          path: /opt/ruby-${{ env.RUBY_VERSION }}
+          key: ${{ runner.os }}-ruby-install-${{ env.RUBY_VERSION }}
+
+      - name: Install ruby ${{ env.RUBY_VERSION }}
+        if: steps.cache-ruby-install.outputs.cache-hit != 'true'
+        run: |
+          PATH="/opt/ruby-build:$PATH" ruby-build $${ env.RUBY_VERSION }} /opt/ruby/${{ env.RUBY_VERSION }}
+
+      - name: Test ruby ${{ env.RUBY_VERSION }}
+        run: |
+          /opt/ruby/${{ env.RUBY_VERSION }}/bin/ruby --version
