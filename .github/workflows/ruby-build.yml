@@ -29,17 +29,17 @@ jobs:
       - name: Install ruby-build ${{ env.RUBY_BUILD_VERSION }}
         if: steps.cache-ruby-build.outputs.cache-hit != 'true'
         run: |
-          apt-get update
-          apt-get install -y curl
+          sudo apt-get update
+          sudo apt-get install -y curl
           curl -Lo ruby-build-v${{ env.RUBY_BUILD_VERSION }}.tar.gz https://github.com/rbenv/ruby-build/archive/refs/tags/v${{ env.RUBY_BUILD_VERSION }}.tar.gz
           tar -zxf ruby-build-v${{ env.RUBY_BUILD_VERSION }}.tar.gz
-          PREFIX=/opt/ruby-build sh -x ./ruby-build-${{ env.RUBY_BUILD_VERSION }}/install.sh
+          sudo env PREFIX=/opt/ruby-build sh -x ./ruby-build-${{ env.RUBY_BUILD_VERSION }}/install.sh
           rm /tmp/ruby-build-v${{ env.RUBY_BUILD_VERSION }}.tar.gz
           rm -r /tmp/ruby-build-${{ env.RUBY_BUILD_VERSION }}/
 
       - name: Install ruby-build dependencies
         run: |
-          apt-get install -y build-essential autoconf libssl-dev libyaml-dev zlib1g-dev libffi-dev libgmp-dev rustc
+          sudo apt-get install -y build-essential autoconf libssl-dev libyaml-dev zlib1g-dev libffi-dev libgmp-dev rustc
         
       - name: Cache ruby install
         id: cache-ruby-install
@@ -51,7 +51,7 @@ jobs:
       - name: Install ruby ${{ env.RUBY_VERSION }}
         if: steps.cache-ruby-install.outputs.cache-hit != 'true'
         run: |
-          PATH="/opt/ruby-build:$PATH" ruby-build $${ env.RUBY_VERSION }} /opt/ruby/${{ env.RUBY_VERSION }}
+          sudo env PATH="/opt/ruby-build:$PATH" ruby-build $${ env.RUBY_VERSION }} /opt/ruby/${{ env.RUBY_VERSION }}
 
       - name: Test ruby ${{ env.RUBY_VERSION }}
         run: |
