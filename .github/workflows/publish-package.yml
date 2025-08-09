@@ -37,7 +37,7 @@ jobs:
         run: |
           echo "::add-mask::$GPG_PRIVATE_KEY"
           echo "$GPG_PRIVATE_KEY" | gpg --batch --import
-          echo "$KEY_ID:6:" | gpg --batch --import-ownertrust --pinentry-mode=loopback
+          echo "$KEY_ID:6:" | tr -d ' ' | gpg --batch --import-ownertrust --pinentry-mode=loopback
 
       - name: Sign debs
         env:
