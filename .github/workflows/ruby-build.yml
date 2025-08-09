@@ -84,11 +84,11 @@ jobs:
 
       - name: Extract
         run: |
-          ls -lR
+          echo "Unpacking ruby ${{ env.RUBY_VERSION }} into /"
           sudo tar -C / -xvf ruby-${{ env.RUBY_VERSION }}.tar
           rm ruby-${{ env.RUBY_VERSION }}.tar
 
       - name: Try Ruby
         run: |
           /opt/ruby/${{ env.RUBY_VERSION }}/bin/ruby --version
-          /opt/ruby/${{ env.RUBY_VERSION }}/bin/ruby -c 'puts "Hello world"'
+          /opt/ruby/${{ env.RUBY_VERSION }}/bin/ruby -e 'puts "Hello world"'
