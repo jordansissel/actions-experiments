@@ -2,15 +2,7 @@ name: Publish
 
 on:
   workflow_dispatch:
-    #inputs:
-      #run_id:
-        #required: true
-        #type: number
   workflow_call:
-    #inputs:
-      #run_id:
-        #required: true
-        #type: number
 
 jobs:
   publish:
@@ -28,10 +20,14 @@ jobs:
 
       - name: Download Artifacts
         uses: actions/download-artifact@v4
-        #with:
-          #github-token: ${{ github.token }}
-          #run-id: ${{ inputs.run_id }}
+        with:
+          path: artifacts
 
-      - name: Explore
+      - name: Push
         run: |
-          ls -lR
+          find artifacts -type f -name '*.deb' -print0 | \
+            xargs -0tn1 sh -c 'reprepro -Vb repo includedeb any "$1"' -
+
+          git add repo
+          git commit repo -m "reprepro packages"
+          git push
