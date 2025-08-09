@@ -56,3 +56,17 @@ jobs:
       - name: Test ruby ${{ env.RUBY_VERSION }}
         run: |
           /opt/ruby/${{ env.RUBY_VERSION }}/bin/ruby --version
+
+      # Github Actions Artifacts don't maintain permissions, so we need to pack
+      # it up into a format that does maintain it.
+      # Citation: https://github.com/actions/upload-artifact?tab=readme-ov-file#permission-loss
+      # > File permissions are not maintained during artifact upload
+      # > If you must preserve permissions, you can tar all of your files together before artifact upload
+      - name: Create archive of ruby ${{ env.RUBY_VERSION }}
+        run: tar -cf ruby-${{ env.RUBY_VERSION }}.tar /opt/ruby/${{ env.RUBY_VERSION }}
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ruby-${{ env.RUBY_VERSION }}
+          path: ruby-${{ env.RUBY_VERSION }}.tar
