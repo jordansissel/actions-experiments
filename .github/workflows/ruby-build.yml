@@ -70,3 +70,23 @@ jobs:
         with:
           name: ruby-${{ env.RUBY_VERSION }}
           path: ruby-${{ env.RUBY_VERSION }}.tar
+
+  ruby-try:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ruby-${{ env.RUBY_VERSION }}
+          path: ruby-${{ env.RUBY_VERSION }}.tar
+
+      - name: Extract
+        run: |
+          sudo tar -C / -xvf ruby-${{ env.RUBY_VERSION }}.tar
+          rm ruby-${{ env.RUBY_VERSION }}.tar
+
+      - name: Try Ruby
+        run: |
+          /opt/ruby/${{ env.RUBY_VERSION }}/bin/ruby --version
+          /opt/ruby/${{ env.RUBY_VERSION }}/bin/ruby -c 'puts "Hello world"'
