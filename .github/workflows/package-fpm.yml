@@ -46,9 +46,13 @@ jobs:
 
           export PATH="/opt/ruby/${{ matrix.ruby_version }}/bin:${PATH}"
 
+          outdir="build/${{ matrix.os }}"
+          mdkir -p "${outdir}"
+
           # Ruby requires libyaml, zlib, libcrypt, and libgmp
           # fpm requires binutils for `ar`
           fpm -s dir -t deb \
+            -p "${outdir}" \
             -n fpm -v "${{ matrix.version }}" \
             --depends libyaml-0-2 \
             --depends zlib1g \
@@ -57,10 +61,10 @@ jobs:
             --depends binutils \
             /opt/ruby/${{ matrix.ruby_version }}/ fpm.sh=/usr/bin/fpm
 
-          echo "filename=$(ls *.deb)" >> $GITHUB_OUTPUT
+          echo "outdir=${outdir}" >> $GITHUB_OUTPUT
       
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{matrix.os}}/${{ steps.package.outputs.filename }}
-          path: ${{ steps.package.outputs.filename }}
+          name: package
+          path: ${{ steps.package.outputs.outdir }}
