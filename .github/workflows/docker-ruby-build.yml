@@ -17,6 +17,7 @@ jobs:
       packages: write
       contents: read
       id-token: write
+      attestations: write
 
     steps:
       - name: Checkout repository
@@ -38,17 +39,22 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and push Docker image
-        id: push
+      - name: Build Docker image
         uses: docker/build-push-action@v6
-        with:
+        with: &docker
           context: ruby-build
-          push: true
+          push: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Push Docker image
+        uses: docker/build-push-action@v6
+        id: push
+        with:
+          <<: *docker
+          push: true
 
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v2
@@ -56,4 +62,3 @@ jobs:
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
-
