@@ -71,3 +71,5 @@ jobs:
 
   publish:
     uses: ./.github/workflows/publish-package.yml
+    permissions:
+      contents: write
