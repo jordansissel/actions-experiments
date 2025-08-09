@@ -37,10 +37,6 @@ jobs:
           rm ruby-build-v${{ env.RUBY_BUILD_VERSION }}.tar.gz
           rm -r ruby-build-${{ env.RUBY_BUILD_VERSION }}/
 
-      - name: Install ruby-build dependencies
-        run: |
-          sudo apt-get install -y build-essential autoconf libssl-dev libyaml-dev zlib1g-dev libffi-dev libgmp-dev rustc
-        
       - name: Cache ruby install
         id: cache-ruby-install
         uses: actions/cache@v4
@@ -48,6 +44,11 @@ jobs:
           path: /opt/ruby/${{ env.RUBY_VERSION }}
           key: ${{ runner.os }}-ruby-install-${{ env.RUBY_VERSION }}
 
+      - name: Install ruby-build dependencies
+        if: steps.cache-ruby-install.outputs.cache-hit != 'true'
+        run: |
+          sudo apt-get install -y build-essential autoconf libssl-dev libyaml-dev zlib1g-dev libffi-dev libgmp-dev rustc
+        
       - name: Install ruby ${{ env.RUBY_VERSION }}
         if: steps.cache-ruby-install.outputs.cache-hit != 'true'
         run: |
