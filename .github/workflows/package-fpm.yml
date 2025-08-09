@@ -44,9 +44,10 @@ jobs:
 
           chmod 755 fpm.sh
 
+          export PATH="/opt/ruby/${{ matrix.ruby_version }}/bin:${PATH}"
+
           # Ruby requires libyaml, zlib, libcrypt, and libgmp
           # fpm requires binutils for `ar`
-          FPM_VERSION="$(fpm --version)"
           fpm -s dir -t deb \
             -n fpm -v "${{ matrix.version }}" \
             --depends libyaml-0-2 \
