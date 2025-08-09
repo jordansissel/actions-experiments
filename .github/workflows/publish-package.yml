@@ -19,18 +19,35 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y reprepro
+          sudo apt-get install -y reprepro gnupg debsigs
 
       - name: Download Artifacts
         uses: actions/download-artifact@v4
         with:
           path: artifacts
 
-      - name: Push
+      - name: Setup GPG
+        env:
+          GPG_PRIVATE_KEY: ${{ .secrets.GPG_PRIVATE_KEY }}
+          KEY_ID: ${{ .vars.KEY_ID }}
+        run: |
+          echo "::add-mask::$GPG_PRIVATE_KEY"
+          echo "$GPG_PRIVATE_KEY" | gpg --batch --import
+          echo "$KEY_ID:6:" | gpg --batch --import-ownertrust --pinentry-mode=loopback
+
+      - name: Sign debs
+        env:
+          KEY_ID: ${{ .vars.KEY_ID }}
+        run: |
+          find artifacts -type f -name '*.deb' -print0 | \
+            xargs -0t debsigs -v --gpgopts="--batch --no-tty --pinentry-mode=loopback" --sign=origin --default-key="$KEY_ID" 
+
+      - name: Run reprepro
         run: |
           find artifacts -type f -name '*.deb' -print0 | \
             xargs -0tn1 sh -c 'reprepro -Vb repo includedeb any "$1"' -
 
+      -name: Commit and push
           # Need to set git user and email
           # Citation> https://github.com/actions/checkout?tab=readme-ov-file#push-a-commit-using-the-built-in-token
           git config user.name "github-actions[bot]"
