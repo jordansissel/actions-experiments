@@ -3,6 +3,10 @@ name: Publish
 on:
   workflow_dispatch:
   workflow_call:
+    secrets:
+      GPG_PRIVATE_KEY:
+        description: "GPG private key"
+        required: true
 
 jobs:
   publish:
