@@ -73,3 +73,5 @@ jobs:
     uses: ./.github/workflows/publish-package.yml
     permissions:
       contents: write
+    secrets:
+      GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
