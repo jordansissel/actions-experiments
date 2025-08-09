@@ -34,8 +34,8 @@ jobs:
           curl -Lo ruby-build-v${{ env.RUBY_BUILD_VERSION }}.tar.gz https://github.com/rbenv/ruby-build/archive/refs/tags/v${{ env.RUBY_BUILD_VERSION }}.tar.gz
           tar -zxf ruby-build-v${{ env.RUBY_BUILD_VERSION }}.tar.gz
           sudo env PREFIX=/opt/ruby-build sh -x ./ruby-build-${{ env.RUBY_BUILD_VERSION }}/install.sh
-          rm /tmp/ruby-build-v${{ env.RUBY_BUILD_VERSION }}.tar.gz
-          rm -r /tmp/ruby-build-${{ env.RUBY_BUILD_VERSION }}/
+          rm ruby-build-v${{ env.RUBY_BUILD_VERSION }}.tar.gz
+          rm -r ruby-build-${{ env.RUBY_BUILD_VERSION }}/
 
       - name: Install ruby-build dependencies
         run: |
