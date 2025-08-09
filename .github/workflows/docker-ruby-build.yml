@@ -41,7 +41,7 @@ jobs:
 
       - name: Build Docker image
         uses: docker/build-push-action@v6
-        with: &docker
+        with:
           context: ruby-build
           push: false
           tags: ${{ steps.meta.outputs.tags }}
@@ -53,8 +53,12 @@ jobs:
         uses: docker/build-push-action@v6
         id: push
         with:
-          <<: *docker
+          context: ruby-build
           push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v2
