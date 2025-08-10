@@ -158,12 +158,13 @@ jobs:
           export GEM_HOME=./gems
           gem install --no-document fpm
 
-          outdir="$(mktemp -d -p "${RUNNER_TEMP}"")"
+          outdir="$(mktemp -d -p "${RUNNER_TEMP}")"
 
           # Ruby requires libyaml, zlib, libcrypt, and libgmp
           ${GEM_HOME}/bin/fpm -s tar -t deb \
             -p "${outdir}" \
             -n fpm-ruby -v "${{ matrix.ruby_version }}" \
+            --architecture native \
             --depends libyaml-0-2 \
             --depends zlib1g \
             --depends libcrypt1 \
