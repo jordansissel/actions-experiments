@@ -119,6 +119,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           artifact-ids: ${{ needs.ruby-build.outputs[format('{0}', matrix.index)].tarball }}
+          path: ruby-${{ matrix.ruby_version }}.tar
 
       - name: Extract
         run: |
