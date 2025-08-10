@@ -50,11 +50,14 @@ jobs:
         run: |
           find artifacts -type f -name '*.deb' -print0 | \
             xargs -0tn1 sh -c '
-              reprepro -Vb repo includedeb any "$1"
-              code=$?
-              echo "reprepro exited: $code"
-              [ $code -eq 0 -o $code -eq 123 ] && exit 0
-              exit $code
+              file=$(basename "$1")
+              letter="$(echo "$file" | cut -c1)"
+              name="$(dpkg-deb -f "$1" Package)"
+              if [ -f "pool/main/$letter/$name/$file" ] ; then 
+                echo "Skipping package because it already exists in repository: $1"
+              else
+                reprepro -Vb repo includedeb any "$1"
+              fi
             ' -
 
       - name: Commit and push
