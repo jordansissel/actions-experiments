@@ -124,7 +124,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.os }}-ruby-${{ matrix.ruby_version }}
-          path: 
+          path: |
             ruby-${{ matrix.ruby_version }}.tar
             .fpm
 
