@@ -19,6 +19,10 @@ jobs:
         id: package
         run: |
           outdir="packages/${{ matrix.image }}/"
+          # replace image:tag with image-tag
+          # this lets us use the image-tag text as part of a docker --volume value
+          outdir="${outdir/:/-}" 
+
           docker run -it --workdir /tmp \
             --volume="./fpm/build.sh:/tmp/build.sh:z" \
             --volume="./${outdir}:/tmp/target:z" \
