@@ -2,6 +2,7 @@ name: Package FPM
 
 on:
   workflow_dispatch:
+  push:
 
 jobs:
   package:
