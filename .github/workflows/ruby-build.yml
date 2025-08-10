@@ -165,10 +165,13 @@ jobs:
       - name: Download Artifact
         id: download
         uses: actions/download-artifact@v4
+        with:
+          path: artifacts
 
       - name: Explore
         run: |
-          ls -lR
+          echo "Download path: ${{ steps.download.outputs.download-path }}"
+          ls -lR "${{ steps.download.outputs.download-path }}"
 
       - name: Package Ruby
         id: package
@@ -181,11 +184,9 @@ jobs:
 
           outdir="$(mktemp -d -p "${RUNNER_TEMP}")"
 
-          file="${{ steps.download.outputs.download-path }}/${{ matrix.os }}-ruby-${{ matrix.ruby_version }}/ruby-${{ matrix.ruby_version }}.tar"
-
           for artifact in "${{ steps.download.outputs.download-path }}"/*; do
             echo "> $artifact"
-            ls -lR "$artifact"
+            ls -l "$artifact"
             (cd $artifact; fpm -p "${outdir}")
           done
 
