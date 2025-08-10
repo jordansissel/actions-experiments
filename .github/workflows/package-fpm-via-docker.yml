@@ -20,8 +20,8 @@ jobs:
         run: |
           outdir="packages/${{ matrix.image }}/"
           docker run -it --workdir /tmp \
-            --volume=./fpm/build.sh:/tmp/build.sh:z \
-            --volume="$PWD/${outdir}:/tmp/target:z \
+            --volume=""./fpm/build.sh:/tmp/build.sh:z" \
+            --volume="./${outdir}:/tmp/target:z" \
             debian:latest sh /tmp/build.sh all
           
           echo "files=<<FILES" >> $GITHUB_OUTPUT
