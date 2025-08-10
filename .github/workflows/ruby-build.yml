@@ -28,7 +28,15 @@ jobs:
     steps:
       - id: set-matrix
         run: |
-          echo 'matrix=${{ toJSON(matrix) }}' >> $GITHUB_OUTPUT
+          # Define the strategy matrix here so all the jobs can share it.
+          printf "%s" 'matrix<<JSON
+          {
+            "os": [ "ubuntu-latest" ]
+            "include": [ 
+              { "ruby_version": "3.4.5" }
+            ],
+          }
+          JSON' >> $GITHUB_OUTPUT
 
   ruby-build:
     needs: [ settings ]
