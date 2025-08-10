@@ -55,6 +55,10 @@ jobs:
               name="$(dpkg-deb -f "$1" Package)"
               echo "Package: $1"
               echo " => pool/main/$letter/$name/$file"
+              pwd
+              ls -l
+              ls pool/main/f/fpm/fpm_1.16.0_amd64.deb || true
+              echo =====
               if [ -f "pool/main/$letter/$name/$file" ] ; then 
                 echo "Skipping package because it already exists in repository: $1"
               else
