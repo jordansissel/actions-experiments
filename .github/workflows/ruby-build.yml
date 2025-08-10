@@ -29,14 +29,12 @@ jobs:
       - id: set-matrix
         run: |
           # Define the strategy matrix here so all the jobs can share it.
-          printf "%s" 'matrix<<JSON
-          {
+          printf "matrix<<JSON\n%s\nJSON\n" '{
             "os": [ "ubuntu-latest" ]
             "include": [ 
               { "ruby_version": "3.4.5" }
             ],
-          }
-          JSON' >> $GITHUB_OUTPUT
+          }' >> $GITHUB_OUTPUT
 
   ruby-build:
     needs: [ settings ]
