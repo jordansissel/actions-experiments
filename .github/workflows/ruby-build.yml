@@ -119,7 +119,7 @@ jobs:
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
-          artifact-id: ${{ needs.ruby-build.outputs[format("{0}", matrix.index)].tarball }}
+          artifact-id: ${{ needs.ruby-build.outputs[format('{0}', matrix.index)].tarball }}
           #name: ${{ matrix.os }}-ruby-${{ matrix.ruby_version }}.tar
           #path: ruby-${{ matrix.ruby_version }}.tar
 
