@@ -56,10 +56,9 @@ jobs:
               echo "Package: $1"
               echo " => pool/main/$letter/$name/$file"
               pwd
-              ls -l
-              ls pool/main/f/fpm/fpm_1.16.0_amd64.deb || true
+              ls repo/pool/main/f/fpm/fpm_1.16.0_amd64.deb || true
               echo =====
-              if [ -f "pool/main/$letter/$name/$file" ] ; then 
+              if [ -f "repo/pool/main/$letter/$name/$file" ] ; then 
                 echo "Skipping package because it already exists in repository: $1"
               else
                 reprepro -Vb repo includedeb any "$1"
