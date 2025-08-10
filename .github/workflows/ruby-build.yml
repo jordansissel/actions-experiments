@@ -124,6 +124,8 @@ jobs:
 
       - name: Extract
         run: |
+          find .
+
           echo "# Unpacking ruby ${{ matrix.ruby_version }}"
           file="${{ steps.download.outputs.download-path }}/ruby-${{ matrix.ruby_version }}.tar"
           sudo tar -C / -xvf "$file"
