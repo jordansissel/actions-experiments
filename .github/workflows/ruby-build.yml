@@ -118,7 +118,7 @@ jobs:
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
-          artifact-id: ${{ needs.ruby-build.outputs[format('{0}', matrix.index)].tarball }}
+          artifact-ids: ${{ needs.ruby-build.outputs[format('{0}', matrix.index)].tarball }}
 
       - name: Extract
         run: |
@@ -138,6 +138,7 @@ jobs:
     steps:
       - name: Download Artifact
         uses: actions/download-artifact@v4
+
       - name: Explore
         run: |
           ls -lR
