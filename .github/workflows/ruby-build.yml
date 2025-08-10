@@ -105,9 +105,8 @@ jobs:
         id: artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.os }}-ruby-${{ matrix.ruby_version }}
-          path:
-            ruby-${{ matrix.ruby_version }}.tar
+          name: ${{ matrix.os }}-ruby-${{ matrix.ruby_version }}.tar
+          path: ruby-${{ matrix.ruby_version }}.tar
 
   ruby-try:
     needs: [ settings, ruby-build ]
@@ -120,8 +119,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           artifact-id: ${{ needs.ruby-build.outputs[format('{0}', matrix.index)].tarball }}
-          #name: ${{ matrix.os }}-ruby-${{ matrix.ruby_version }}.tar
-          #path: ruby-${{ matrix.ruby_version }}.tar
 
       - name: Extract
         run: |
