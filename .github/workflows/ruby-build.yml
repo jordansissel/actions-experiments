@@ -131,7 +131,6 @@ jobs:
           file="${{ steps.download.outputs.download-path }}/${{ matrix.os }}-ruby-${{ matrix.ruby_version }}/ruby-${{ matrix.ruby_version }}.tar"
           sudo tar -C / -xvf "$file"
           rm "$file"
-          rmdir "${{ steps.download.outputs.download-path }}"
 
       - name: Try Ruby
         run: |
