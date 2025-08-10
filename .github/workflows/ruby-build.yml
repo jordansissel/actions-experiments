@@ -1,4 +1,4 @@
-name: Build Packages
+name: Package Ruby
 
 on:
   workflow_dispatch:
@@ -20,17 +20,20 @@ on:
         default: "20250724"
         type: string
 
-env:
-  RUBY_VERSION: "3.4.5"
-  RUBY_BUILD_VERSION: "20250724"
-
 jobs:
-  ruby-build:
-    strategy:
-      matrix:
-        ruby_version: [ "3.4.5" ] 
-        os: [ "ubuntu-latest" ]
+  settings:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - id: set-matrix
+        run: |
+          echo 'matrix=${{ toJSON(matrix) }}' >> $GITHUB_OUTPUT
 
+  ruby-build:
+    needs: [ settings ]
+    strategy:
+      matrix: ${{ fromJSON(needs.settings.outputs.matrix) }}
     runs-on: ${{ matrix.os }}
 
     permissions:
@@ -85,23 +88,28 @@ jobs:
       # > File permissions are not maintained during artifact upload
       # > If you must preserve permissions, you can tar all of your files together before artifact upload
       - name: Create archive of ruby ${{ matrix.ruby_version }}
-        run: tar -cf ruby-${{ matrix.ruby_version }}.tar /opt/ruby/${{ matrix.ruby_version }}
+        run: |
+          tar -cf ruby-${{ matrix.ruby_version }}.tar /opt/ruby/${{ matrix.ruby_version }}
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ruby-${{ matrix.ruby_version }}.tar
-          path: ruby-${{ matrix.ruby_version }}.tar
+          name: ${{ matrix.os }}-ruby-${{ matrix.ruby_version }}
+          path:
+            ruby-${{ matrix.ruby_version }}.tar
 
   ruby-try:
-    runs-on: ubuntu-latest
-    needs: [ ruby-build ]
+    needs: [ settings, ruby-build ]
+    strategy:
+      matrix: ${{ fromJSON(needs.settings.outputs.matrix) }}
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
-          name: ruby-${{ matrix.ruby_version }}.tar
+          name: ${{ matrix.os }}-ruby-${{ matrix.ruby_version }}.tar
+          path: ruby-${{ matrix.ruby_version }}.tar
 
       - name: Extract
         run: |
@@ -115,10 +123,16 @@ jobs:
           /opt/ruby/${{ matrix.ruby_version }}/bin/ruby -e 'puts "Hello world"'
 
   ruby-package:
-      runs-on: ubuntu-latest
-      needs: [ ruby-try ]
+    runs-on: ubuntu-latest
+    needs: [ settings, ruby-try ]
 
-      steps:
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+      - name: Explore
+        run: |
+          ls -lR
+
       - name: Package Ruby
         id: package
         run: |
@@ -131,19 +145,19 @@ jobs:
           outdir="$(mktemp -d -p "${RUNNER_TEMP}"")"
 
           # Ruby requires libyaml, zlib, libcrypt, and libgmp
-          ${GEM_HOME}/bin/fpm -s dir -t deb \
+          ${GEM_HOME}/bin/fpm -s tar -t deb \
             -p "${outdir}" \
             -n fpm-ruby -v "${{ matrix.ruby_version }}" \
             --depends libyaml-0-2 \
             --depends zlib1g \
             --depends libcrypt1 \
             --depends libgmp10 \
-            /opt/ruby/${{ matrix.ruby_version }}/
+            ruby-${{ matrix.ruby_version }}.tar
 
           echo "outdir=${outdir}" >> $GITHUB_OUTPUT
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ruby-${{ matrix.os }}
+          name: ${{ matrix.os }}-ruby-${{ matrix.ruby_version }}
           path: ${{ steps.package.outputs.outdir }}
