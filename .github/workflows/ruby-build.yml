@@ -116,6 +116,7 @@ jobs:
 
     steps:
       - name: Download Artifact
+        id: download
         uses: actions/download-artifact@v4
         with:
           artifact-ids: ${{ needs.ruby-build.outputs[format('{0}', matrix.index)].tarball }}
@@ -123,9 +124,14 @@ jobs:
 
       - name: Extract
         run: |
-          echo "Unpacking ruby ${{ matrix.ruby_version }} into /"
-          sudo tar -C / -xvf ruby-${{ matrix.ruby_version }}.tar
-          rm ruby-${{ matrix.ruby_version }}.tar
+          echo ===
+          ls -l
+          echo ===
+          ls -l ${{ steps.download.outputs.download-path }}
+          echo ===
+          echo "# Unpacking ruby ${{ matrix.ruby_version }}"
+          sudo tar -C / -xvf ${{ steps.download.outputs.download-path }}
+          rm ${{ steps.download.outputs.download-path }}
 
       - name: Try Ruby
         run: |
