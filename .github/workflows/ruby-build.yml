@@ -160,6 +160,8 @@ jobs:
 
           outdir="$(mktemp -d -p "${RUNNER_TEMP}")"
 
+          file="${{ steps.download.outputs.download-path }}/${{ matrix.os }}-ruby-${{ matrix.ruby_version }}/ruby-${{ matrix.ruby_version }}.tar"
+
           # Ruby requires libyaml, zlib, libcrypt, and libgmp
           ${GEM_HOME}/bin/fpm -s tar -t deb \
             -p "${outdir}" \
@@ -169,7 +171,7 @@ jobs:
             --depends zlib1g \
             --depends libcrypt1 \
             --depends libgmp10 \
-            ruby-${{ matrix.ruby_version }}.tar
+            "$file"
 
           echo "outdir=${outdir}" >> $GITHUB_OUTPUT
 
