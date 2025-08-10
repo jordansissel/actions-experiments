@@ -27,13 +27,15 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - id: set-matrix
+        # Validate this mess with this:
+        # sgrep set-matrix .github/workflows/ruby-build.yml | sed -e '1,/run:/d; s/>>.*//' | sh | sed -e '1d;$d' | jq
         run: |
           # Define the strategy matrix here so all the jobs can share it.
           printf "matrix<<JSON\n%s\nJSON\n" '{
-            "os": [ "ubuntu-latest" ]
+            "os": [ "ubuntu-latest" ],
             "include": [ 
               { "ruby_version": "3.4.5" }
-            ],
+            ]
           }' >> $GITHUB_OUTPUT
 
   ruby-build:
