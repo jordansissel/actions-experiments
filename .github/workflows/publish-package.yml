@@ -9,7 +9,7 @@ on:
         required: true
 
 jobs:
-  publish:
+  Publish Package:
     permissions:
       contents: write
 
@@ -49,7 +49,11 @@ jobs:
       - name: Run reprepro
         run: |
           find artifacts -type f -name '*.deb' -print0 | \
-            xargs -0tn1 sh -c 'reprepro -Vb repo includedeb any "$1"' -
+            reprepro -Vb repo includedeb any "$1"
+            code=$?
+            [ $code -eq 0 -o $code -eq 123 ] && exit 0
+            exit $code
+          ' -
 
       - name: Commit and push
         run: |
