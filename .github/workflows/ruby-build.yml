@@ -149,7 +149,7 @@ jobs:
           echo "# Unpacking ruby ${{ matrix.ruby_version }}"
           # <download path>/<artifact name>/ruby-version.tar
           file="${{ steps.download.outputs.download-path }}/${{ matrix.os }}-ruby-${{ matrix.ruby_version }}/ruby-${{ matrix.ruby_version }}.tar"
-          sudo tar -C / -xvf "$file"
+          sudo tar -C / -xf "$file"
           rm "$file"
 
       - name: Try Ruby
