@@ -26,7 +26,12 @@ env:
 
 jobs:
   ruby-build:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby_version: [ "3.4.5" ] 
+        os: [ "ubuntu-latest" ]
+
+    runs-on: ${{ matrix.os }}
 
     permissions:
       contents: read
@@ -57,36 +62,36 @@ jobs:
         id: cache-ruby-install
         uses: actions/cache@v4
         with:
-          path: /opt/ruby/${{ inputs.ruby_version }}
-          key: ${{ runner.os }}-ruby-install-${{ inputs.ruby_version }}
+          path: /opt/ruby/${{ matrix.ruby_version }}
+          key: ${{ runner.os }}-ruby-install-${{ matrix.ruby_version }}
 
       - name: Install ruby-build dependencies
         if: steps.cache-ruby-install.outputs.cache-hit != 'true'
         run: |
           sudo apt-get install -y build-essential autoconf libssl-dev libyaml-dev zlib1g-dev libffi-dev libgmp-dev rustc
         
-      - name: Install ruby ${{ inputs.ruby_version }}
+      - name: Install ruby ${{ matrix.ruby_version }}
         if: steps.cache-ruby-install.outputs.cache-hit != 'true'
         run: |
-          sudo env PATH="/opt/ruby-build/bin:$PATH" ruby-build ${{ inputs.ruby_version }} /opt/ruby/${{ inputs.ruby_version }}
+          sudo env PATH="/opt/ruby-build/bin:$PATH" ruby-build ${{ matrix.ruby_version }} /opt/ruby/${{ matrix.ruby_version }}
 
-      - name: Test ruby ${{ inputs.ruby_version }}
+      - name: Test ruby ${{ matrix.ruby_version }}
         run: |
-          /opt/ruby/${{ inputs.ruby_version }}/bin/ruby --version
+          /opt/ruby/${{ matrix.ruby_version }}/bin/ruby --version
 
       # Github Actions Artifacts don't maintain permissions, so we need to pack
       # it up into a format that does maintain it.
       # Citation: https://github.com/actions/upload-artifact?tab=readme-ov-file#permission-loss
       # > File permissions are not maintained during artifact upload
       # > If you must preserve permissions, you can tar all of your files together before artifact upload
-      - name: Create archive of ruby ${{ inputs.ruby_version }}
-        run: tar -cf ruby-${{ inputs.ruby_version }}.tar /opt/ruby/${{ inputs.ruby_version }}
+      - name: Create archive of ruby ${{ matrix.ruby_version }}
+        run: tar -cf ruby-${{ matrix.ruby_version }}.tar /opt/ruby/${{ matrix.ruby_version }}
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ruby-${{ inputs.ruby_version }}.tar
-          path: ruby-${{ inputs.ruby_version }}.tar
+          name: ruby-${{ matrix.ruby_version }}.tar
+          path: ruby-${{ matrix.ruby_version }}.tar
 
   ruby-try:
     runs-on: ubuntu-latest
@@ -96,15 +101,49 @@ jobs:
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
-          name: ruby-${{ inputs.ruby_version }}.tar
+          name: ruby-${{ matrix.ruby_version }}.tar
 
       - name: Extract
         run: |
-          echo "Unpacking ruby ${{ inputs.ruby_version }} into /"
-          sudo tar -C / -xvf ruby-${{ inputs.ruby_version }}.tar
-          rm ruby-${{ inputs.ruby_version }}.tar
+          echo "Unpacking ruby ${{ matrix.ruby_version }} into /"
+          sudo tar -C / -xvf ruby-${{ matrix.ruby_version }}.tar
+          rm ruby-${{ matrix.ruby_version }}.tar
 
       - name: Try Ruby
         run: |
-          /opt/ruby/${{ inputs.ruby_version }}/bin/ruby --version
-          /opt/ruby/${{ inputs.ruby_version }}/bin/ruby -e 'puts "Hello world"'
+          /opt/ruby/${{ matrix.ruby_version }}/bin/ruby --version
+          /opt/ruby/${{ matrix.ruby_version }}/bin/ruby -e 'puts "Hello world"'
+
+  ruby-package:
+      runs-on: ubuntu-latest
+      needs: [ ruby-try ]
+
+      steps:
+      - name: Package Ruby
+        id: package
+        run: |
+          export PATH="/opt/ruby/${{ matrix.ruby_version }}/bin:${PATH}"
+
+          # Install fpm to a non-default location and then use it to package ruby.
+          export GEM_HOME=./gems
+          gem install --no-document fpm
+
+          outdir="$(mktemp -d -p "${RUNNER_TEMP}"")"
+
+          # Ruby requires libyaml, zlib, libcrypt, and libgmp
+          ${GEM_HOME}/bin/fpm -s dir -t deb \
+            -p "${outdir}" \
+            -n fpm-ruby -v "${{ matrix.ruby_version }}" \
+            --depends libyaml-0-2 \
+            --depends zlib1g \
+            --depends libcrypt1 \
+            --depends libgmp10 \
+            /opt/ruby/${{ matrix.ruby_version }}/
+
+          echo "outdir=${outdir}" >> $GITHUB_OUTPUT
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ruby-${{ matrix.os }}
+          path: ${{ steps.package.outputs.outdir }}
