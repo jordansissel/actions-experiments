@@ -28,7 +28,7 @@ jobs:
       - name: Download Artifacts
         uses: actions/download-artifact@v4
         with:
-          path: artifacts
+          path: ${{ runner.temp }}/artifacts
 
       - name: Setup GPG
         env:
@@ -43,27 +43,13 @@ jobs:
         env:
           KEY_ID: ${{ vars.KEY_ID }}
         run: |
-          find artifacts -type f -name '*.deb' -print0 | \
+          find "${RUNNER_TEMP}/artifacts" -type f -name '*.deb' -print0 | \
             xargs -0t debsigs -v --gpgopts="--batch --no-tty --pinentry-mode=loopback" --sign=origin --default-key="$KEY_ID" 
 
       - name: Run reprepro
         run: |
-          find artifacts -type f -name '*.deb' -print0 | \
-            xargs -0tn1 sh -c '
-              file=$(basename "$1")
-              letter="$(echo "$file" | cut -c1)"
-              name="$(dpkg-deb -f "$1" Package)"
-              echo "Package: $1"
-              echo " => pool/main/$letter/$name/$file"
-              pwd
-              ls repo/pool/main/f/fpm/fpm_1.16.0_amd64.deb || true
-              echo =====
-              if [ -f "repo/pool/main/$letter/$name/$file" ] ; then 
-                echo "Skipping package because it already exists in repository: $1"
-              else
-                reprepro -Vb repo includedeb any "$1"
-              fi
-            ' -
+          find "${RUNNER_TEMP}/artifacts" -type f -name '*.deb' -print0 | \
+            xargs -0tn1 reprepro -Vb repo includedeb any
 
       - name: Commit and push
         run: |
