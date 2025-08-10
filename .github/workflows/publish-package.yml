@@ -52,6 +52,7 @@ jobs:
             xargs -0tn1 sh -c '
               reprepro -Vb repo includedeb any "$1"
               code=$?
+              echo "reprepro exited: $code"
               [ $code -eq 0 -o $code -eq 123 ] && exit 0
               exit $code
             ' -
