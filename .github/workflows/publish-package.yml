@@ -53,6 +53,8 @@ jobs:
               file=$(basename "$1")
               letter="$(echo "$file" | cut -c1)"
               name="$(dpkg-deb -f "$1" Package)"
+              echo "Package: $1"
+              echo " => pool/main/$letter/$name/$file"
               if [ -f "pool/main/$letter/$name/$file" ] ; then 
                 echo "Skipping package because it already exists in repository: $1"
               else
