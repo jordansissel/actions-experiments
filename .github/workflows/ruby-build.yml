@@ -120,14 +120,15 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           artifact-ids: ${{ needs.ruby-build.outputs[format('{0}', matrix.index)].tarball }}
-          #path: ruby-${{ matrix.ruby_version }}.tar
+          #path: artifact
 
       - name: Extract
         run: |
           find .
 
           echo "# Unpacking ruby ${{ matrix.ruby_version }}"
-          file="${{ steps.download.outputs.download-path }}/ruby-${{ matrix.ruby_version }}.tar"
+          # <download path>/<artifact name>/ruby-version.tar
+          file="${{ steps.download.outputs.download-path }}/${{ matrix.os }}-ruby-${{ matrix.ruby_version }}/ruby-${{ matrix.ruby_version }}.tar"
           sudo tar -C / -xvf "$file"
           rm "$file"
           rmdir "${{ steps.download.outputs.download-path }}"
