@@ -98,15 +98,35 @@ jobs:
       # > File permissions are not maintained during artifact upload
       # > If you must preserve permissions, you can tar all of your files together before artifact upload
       - name: Create archive of ruby ${{ matrix.ruby_version }}
+        id: tarball
         run: |
-          tar -cf ruby-${{ matrix.ruby_version }}.tar /opt/ruby/${{ matrix.ruby_version }}
+          path="ruby-${{ matrix.ruby_version }}.tar"
+          tar -cf "$path" /opt/ruby/${{ matrix.ruby_version }}
+          echo "path=$path" >> $GITHUB_OUTPUT
+
+      - name: Create .fpm file
+        run: |
+          (
+            echo '-s deb'
+            echo '-s tar'
+            echo '--name fpm-ruby'
+            echo '--version ${{ matrix.ruby_version }}'
+            echo '--architecture native'
+            echo '--depends libyaml-0-2'
+            echo '--depends zlib1g'
+            echo '--depends libcrypt1'
+            echo '--depends libgmp10'
+            echo "${{ steps.tarball.path }}"
+          )  > .fpm
 
       - name: Upload Artifact
         id: artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.os }}-ruby-${{ matrix.ruby_version }}
-          path: ruby-${{ matrix.ruby_version }}.tar
+          path: 
+            ruby-${{ matrix.ruby_version }}.tar
+            .fpm
 
   ruby-try:
     needs: [ settings, ruby-build ]
@@ -162,16 +182,11 @@ jobs:
 
           file="${{ steps.download.outputs.download-path }}/${{ matrix.os }}-ruby-${{ matrix.ruby_version }}/ruby-${{ matrix.ruby_version }}.tar"
 
-          # Ruby requires libyaml, zlib, libcrypt, and libgmp
-          ${GEM_HOME}/bin/fpm -s tar -t deb \
-            -p "${outdir}" \
-            -n fpm-ruby -v "${{ matrix.ruby_version }}" \
-            --architecture native \
-            --depends libyaml-0-2 \
-            --depends zlib1g \
-            --depends libcrypt1 \
-            --depends libgmp10 \
-            "$file"
+          for artifact in "${{ steps.download.outputs.download-path }}"/*; do
+            echo "> $artifact"
+            ls -lR "$artifact"
+            (cd $artifact; fpm -p "${outdir}")
+          done
 
           echo "outdir=${outdir}" >> $GITHUB_OUTPUT
 
