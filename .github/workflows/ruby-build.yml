@@ -43,6 +43,8 @@ jobs:
     strategy:
       matrix: ${{ fromJSON(needs.settings.outputs.matrix) }}
     runs-on: ${{ matrix.os }}
+    outputs:
+      tarball: ${{ steps.upload.outputs.artifact-id }}
 
     permissions:
       contents: read
@@ -100,6 +102,7 @@ jobs:
           tar -cf ruby-${{ matrix.ruby_version }}.tar /opt/ruby/${{ matrix.ruby_version }}
 
       - name: Upload Artifact
+        id: artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.os }}-ruby-${{ matrix.ruby_version }}
@@ -116,8 +119,9 @@ jobs:
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
-          name: ${{ matrix.os }}-ruby-${{ matrix.ruby_version }}.tar
-          path: ruby-${{ matrix.ruby_version }}.tar
+          artifact-id: ${{ needs.ruby-build.outputs[format("{0}", matrix.index)].tarball }}
+          #name: ${{ matrix.os }}-ruby-${{ matrix.ruby_version }}.tar
+          #path: ruby-${{ matrix.ruby_version }}.tar
 
       - name: Extract
         run: |
