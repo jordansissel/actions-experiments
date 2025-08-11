@@ -39,16 +39,19 @@ fpm_flags() {
       echo "-t deb"
       echo "--depends rpm"
       echo "--depends binutils"
+      echo "--depends ruby"
       ;;
     almalinux|rocky)
       echo "-t rpm"
       echo "--depends rpm-build"
       echo "--depends binutils"
+      echo "--depends ruby"
       ;;
     fedora)
       echo "-t rpm"
       echo "--depends rpm-build"
       echo "--depends binutils"
+      echo "--depends ruby"
       ;;
     * )
       echo "Unsupported OS: ${ID}"
