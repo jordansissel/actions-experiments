@@ -20,7 +20,7 @@ runs:
     run: |
       hash="$(echo "${{ inputs.packages }}" | sha256sum | cut -f 1 -d ' ')"
 
-      echo "hash=${hash}" >> $GITHUB_OUTPUTS
+      echo "hash=${hash}" >> $GITHUB_OUTPUT
 
   - name: Restore cache
     uses: actions/cache/restore@v4
