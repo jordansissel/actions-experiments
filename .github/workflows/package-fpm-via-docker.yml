@@ -3,6 +3,9 @@ name: Package FPM via docker
 on:
   workflow_dispatch:
 
+env:
+  registry: ghcr.io
+
 jobs:
   package:
     name: 📦 FPM v${{ matrix.version }} for ${{ matrix.image }}
@@ -23,6 +26,13 @@ jobs:
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: ${{ env.registry }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Docker image
         id: container
