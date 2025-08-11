@@ -46,6 +46,8 @@ jobs:
 
           outdir="packages/$target"
 
+          echo "> Package file: ${{ steps.package.outputs.files }}"
+
           docker run --workdir /tmp \
             --volume="./fpm/verify.sh:/tmp/verify.sh:z" \
             --volume="./${outdir}:/tmp/target:z" \

@@ -17,10 +17,10 @@ setup() {
   case "${ID}" in
     ubuntu|debian) 
       apt-get update
-      apt-get install -y "$1"
+      apt-get install -y "${1}"/*.deb
       ;;
     almalinux|rocky|fedora)
-      dnf install -y "$1"
+      dnf install -y "$1"/*.rpm
       ;;
     * )
       echo "Unsupported OS: ${ID}"
