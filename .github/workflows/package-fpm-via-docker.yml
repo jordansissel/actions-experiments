@@ -37,6 +37,20 @@ jobs:
 
           echo "target=$target" >> $GITHUB_OUTPUT
 
+      - name: "Verify package works"
+        run: |
+          target="${{ matrix.image }}"
+          # replace image:tag with image-tag
+          # this lets us use the image-tag text as part of a docker --volume value
+          target="${target/:/-}" 
+
+          outdir="packages/$target"
+
+          docker run --workdir /tmp \
+            --volume="./fpm/verify.sh:/tmp/verify.sh:z" \
+            --volume="./${outdir}:/tmp/target:z" \
+            ${{ matrix.image }} sh -x /tmp/verify.sh /tmp/target/
+
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
