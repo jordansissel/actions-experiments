@@ -4,17 +4,18 @@ on:
   workflow_dispatch:
 
 jobs:
+  setup:
+    uses: ./.github/workflows/cache-apt.yml
+    with:
+      packages:
+        zsh tmux ruby
+
   example:
+    needs: [ setup ]
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Prepare Packages
-        uses: ./.github/workflows/cache-apt.yml
-        with:
-          packages:
-            zsh tmux ruby
+      #- name: Checkout repository
+        #uses: actions/checkout@v4
 
       - name: Try something
         run: |
