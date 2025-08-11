@@ -11,11 +11,13 @@ runs:
     uses: actions/cache/restore@v4
     id: apt-cache
     with:
+      # Excluding patterns behave kinda weird...
+      # https://github.com/actions/toolkit/issues/713#issuecomment-1030643364
       path: |
         /var/cache/apt/archives/*.deb
         /var/cache/apt/srcpkgcache.bin
         /var/cache/apt/pkgcache.bin
-        /var/lib/apt/lists
+        /var/lib/apt/lists/*
         !/var/lib/apt/lists/lock
         !/var/lib/apt/lists/partial
       key: ${{ runner.os }}-apt-cache
@@ -31,11 +33,13 @@ runs:
     uses: actions/cache/save@v4
     if: ${{ steps.apt-cache.outputs.cache-hit != 'true' }}
     with:
+      # Excluding patterns behave kinda weird...
+      # https://github.com/actions/toolkit/issues/713#issuecomment-1030643364
       path: |
         /var/cache/apt/archives/*.deb
         /var/cache/apt/srcpkgcache.bin
         /var/cache/apt/pkgcache.bin
-        /var/lib/apt/lists
+        /var/lib/apt/lists/*
         !/var/lib/apt/lists/lock
         !/var/lib/apt/lists/partial
       key: ${{ steps.apt-cache.outputs.cache-primary-key }}
