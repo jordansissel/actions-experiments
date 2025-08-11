@@ -7,6 +7,9 @@ jobs:
   example:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Prepare Packages
         uses: ./.github/workflows/cache-apt.yml
         with:
