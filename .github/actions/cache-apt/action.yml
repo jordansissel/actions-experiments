@@ -17,9 +17,8 @@ runs:
         /var/cache/apt/archives/*.deb
         /var/cache/apt/srcpkgcache.bin
         /var/cache/apt/pkgcache.bin
-        /var/lib/apt/lists/*
-        !/var/lib/apt/lists/lock
-        !/var/lib/apt/lists/partial
+        /var/lib/apt/lists/*InRelease*
+        /var/lib/apt/lists/*Packages*
       key: ${{ runner.os }}-apt-cache
 
   - name: apt-get, downloading only
@@ -28,6 +27,10 @@ runs:
     run: |
       sudo apt-get update
       sudo apt-get install --download-only ${{ inputs.packages }}
+
+      echo "BEGIN APT FILES"
+      find /var/lib/apt/lists -maxdepth 1
+      echo "END APT FILES"
 
   - name: Save to cache
     uses: actions/cache/save@v4
@@ -39,9 +42,8 @@ runs:
         /var/cache/apt/archives/*.deb
         /var/cache/apt/srcpkgcache.bin
         /var/cache/apt/pkgcache.bin
-        /var/lib/apt/lists/*
-        !/var/lib/apt/lists/lock
-        !/var/lib/apt/lists/partial
+        /var/lib/apt/lists/*InRelease*
+        /var/lib/apt/lists/*Packages*
       key: ${{ steps.apt-cache.outputs.cache-primary-key }}
 
   # https://github.com/actions/runner-images/issues/10977
