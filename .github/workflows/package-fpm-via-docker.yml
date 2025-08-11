@@ -5,12 +5,12 @@ on:
 
 jobs:
   package:
-    name: Package FPM
     runs-on: ubuntu-latest
     strategy:
       matrix:
         version: [ 1.16.0 ]
         image: [ "rockylinux:9", "fedora:42", "ubuntu:24.04", "ubuntu:22.04", "debian:11", "debian:12" ]
+    name: 📦 FPM v${{ matrix.version }} for ${{ matrix.image }}
 
     steps:
       - name: Checkout repository
