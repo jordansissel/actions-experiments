@@ -15,9 +15,3 @@ jobs:
       with:
         packages:
           build-essential autoconf libssl-dev libyaml-dev zlib1g-dev libffi-dev libgmp-dev rustc
-
-    - name: Try something
-      run: |
-        zsh --version
-        tmux -V
-        ruby --version
