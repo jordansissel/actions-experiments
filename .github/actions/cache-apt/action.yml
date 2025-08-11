@@ -50,8 +50,8 @@ runs:
   - name: Disable man-db trigger for better install speed
     shell: bash
     run: |
-      echo "set man-db/auto-update false" | debconf-communicate
-      dpkg-reconfigure man-db < /dev/null || true
+      echo "set man-db/auto-update false" | sudo debconf-communicate
+      sudo dpkg-reconfigure man-db < /dev/null || true
 
   - name: apt-get install ${{ inputs.packages }}
     shell: bash
