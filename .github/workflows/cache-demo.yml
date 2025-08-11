@@ -14,7 +14,7 @@ jobs:
       uses: ./.github/actions/cache-apt
       with:
         packages:
-          zsh tmux ruby python nodejs
+          zsh tmux ruby python3 nodejs
 
     - name: Try something
       run: |
