@@ -9,6 +9,10 @@ runs:
   steps:
   - name: Tweak permissions temporarily so that cache restore works
     shell: bash
+    # This is necessary because action/cache runs as the normal runner user
+    # which doesn't have permission to read or write most of the places we want
+    # to cache.
+    # These permissions must be restored after the caching step.
     run: |
       id=$(whoami)
       sudo chown ${id} /var/cache/apt/archives
