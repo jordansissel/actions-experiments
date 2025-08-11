@@ -44,8 +44,8 @@ runs:
     if: ${{ steps.apt-cache.outputs.cache-hit != 'true' }}
     shell: bash
     run: |
-      sudo apt-get update
-      sudo apt-get install --download-only ${{ inputs.packages }}
+      time sudo apt-get update
+      time sudo apt-get install --download-only ${{ inputs.packages }}
 
   - name: Save to cache
     uses: actions/cache/save@v4
