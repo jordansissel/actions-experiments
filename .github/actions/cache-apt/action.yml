@@ -47,10 +47,6 @@ runs:
       sudo apt-get update
       sudo apt-get install --download-only ${{ inputs.packages }}
 
-      echo "BEGIN APT FILES"
-      find /var/lib/apt/lists -maxdepth 1
-      echo "END APT FILES"
-
   - name: Save to cache
     uses: actions/cache/save@v4
     if: ${{ steps.apt-cache.outputs.cache-hit != 'true' }}
