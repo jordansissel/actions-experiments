@@ -22,6 +22,7 @@ runs:
 
   - name: apt-get, downloading only
     if: ${{ steps.apt-cache.outputs.cache-hit != 'true' }}
+    shell: bash
     run: |
       sudo apt-get update
       sudo apt-get install --download-only ${{ inputs.packages }}
@@ -40,5 +41,6 @@ runs:
       key: ${{ steps.apt-cache.outputs.cache-primary-key }}
 
   - name: apt-get install ${{ inputs.packages }}
+    shell: bash
     run: |
       time sudo apt-get install ${{ inputs.packages }}
