@@ -5,56 +5,62 @@ on:
 
 jobs:
   package:
+    name: 📦 FPM v${{ matrix.version }} for ${{ matrix.image }}
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
         version: [ 1.16.0 ]
         image: [ "rockylinux:9", "fedora:42", "ubuntu:24.04", "ubuntu:22.04", "debian:11", "debian:12" ]
-    name: 📦 FPM v${{ matrix.version }} for ${{ matrix.image }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: "Package fpm with fpm :)"
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+
+      - name: Build Docker image
+        id: container
+        uses: docker/build-push-action@v6
+        with:
+          context: fpm
+          push: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            IMAGE=${{ matrix.image }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: ""
         id: package
         run: |
-          target="${{ matrix.image }}"
-          # replace image:tag with image-tag
-          # this lets us use the image-tag text as part of a docker --volume value
-          target="${target/:/-}" 
+          # Extract content from the docker image built in the previous step
 
-          outdir="packages/$target"
+          docker run ${{ steps.container.outputs.imageid }} tar -zc target | tar -zvx | tee files
 
-          docker run --workdir /tmp \
-            --volume="./fpm/build.sh:/tmp/build.sh:z" \
-            --volume="./${outdir}:/tmp/target:z" \
-            ${{ matrix.image }} sh -x /tmp/build.sh all
-          
-          echo "files<<FILES" >> $GITHUB_OUTPUT
-          find "${outdir}" >> $GITHUB_OUTPUT
-          echo "FILES"  >> $GITHUB_OUTPUT
-
-          echo "target=$target" >> $GITHUB_OUTPUT
+          (
+            echo "files<<FILES"
+            cat files
+            echo "FILES"
+          ) >> $GITHUB_OUTPUT
 
       - name: "Verify package works"
         run: |
-          target="${{ matrix.image }}"
-          # replace image:tag with image-tag
-          # this lets us use the image-tag text as part of a docker --volume value
-          target="${target/:/-}" 
-
-          outdir="packages/$target"
-
           echo "> Package file: ${{ steps.package.outputs.files }}"
 
           docker run --workdir /tmp \
             --volume="./fpm/verify.sh:/tmp/verify.sh:z" \
-            --volume="./${outdir}:/tmp/target:z" \
+            --volume="./target:/tmp/target:z" \
             ${{ matrix.image }} sh -x /tmp/verify.sh /tmp/target/
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ steps.package.outputs.target }}
+          name: ${{ matrix.image }}
           path: ${{ steps.package.outputs.files }}
