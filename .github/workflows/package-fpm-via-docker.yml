@@ -43,10 +43,14 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: ""
+      - name: Grab package file
         id: package
         run: |
           # Extract content from the docker image built in the previous step
+
+          echo "=== docker step outputs"
+          echo "${{ toJSON(steps.container.outputs) }}"
+          echo "=== end
 
           docker run ${{ steps.container.outputs.imageid }} tar -zc target | tar -zvx | tee files
 
