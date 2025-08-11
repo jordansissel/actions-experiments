@@ -1,7 +1,6 @@
 name: Publish
 
 on:
-  workflow_dispatch:
   workflow_call:
     secrets:
       GPG_PRIVATE_KEY:
@@ -16,21 +15,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Job Setup
+        uses: ${{ github.repository }}/.github/actions/cache-apt@main
+        with:
+          packages:
+            reprepro gnupg debsigs
+
       - uses: actions/checkout@v4
         with:
           ref: pages
-
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y reprepro gnupg debsigs
 
       - name: Download Artifacts
         uses: actions/download-artifact@v4
         with:
           path: ${{ runner.temp }}/artifacts
 
-      - name: Setup GPG
+      - name: Configure GPG
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
           KEY_ID: ${{ vars.KEY_ID }}
