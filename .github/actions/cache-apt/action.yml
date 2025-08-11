@@ -1,0 +1,44 @@
+name: Cache APT operations
+inputs:
+  packages:
+    required: true
+    type: string
+
+runs:
+  using: composite
+  steps:
+  - name: Restore cache
+    uses: actions/cache/restore@v4
+    id: apt-cache
+    with:
+      path: |
+        /var/cache/apt/archives/*.deb
+        /var/cache/apt/srcpkgcache.bin
+        /var/cache/apt/pkgcache.bin
+        /var/lib/apt/lists
+        !/var/lib/apt/lists/lock
+        !/var/lib/apt/lists/partial
+      key: ${{ runner.os }}-apt-cache
+
+  - name: apt-get, downloading only
+    if: ${{ steps.apt-cache.outputs.cache-hit != 'true' }}
+    run: |
+      sudo apt-get update
+      sudo apt-get install --download-only ${{ inputs.packages }}
+
+  - name: Save to cache
+    uses: actions/cache/save@v4
+    if: ${{ steps.apt-cache.outputs.cache-hit != 'true' }}
+    with:
+      path: |
+        /var/cache/apt/archives/*.deb
+        /var/cache/apt/srcpkgcache.bin
+        /var/cache/apt/pkgcache.bin
+        /var/lib/apt/lists
+        !/var/lib/apt/lists/lock
+        !/var/lib/apt/lists/partial
+      key: ${{ steps.apt-cache.outputs.cache-primary-key }}
+
+  - name: apt-get install ${{ inputs.packages }}
+    run: |
+      time sudo apt-get install ${{ inputs.packages }}
