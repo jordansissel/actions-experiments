@@ -1,0 +1,20 @@
+name: APT Cache Demo
+
+on:
+  workflow_dispatch:
+
+jobs:
+  example:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prepare Packages
+        uses: ./.github/workflows/cache-apt.yml
+        with:
+          packages:
+            zsh tmux ruby
+
+      - name: Try something
+        run: |
+          zsh --version
+          tmux --version
+          ruby --version
