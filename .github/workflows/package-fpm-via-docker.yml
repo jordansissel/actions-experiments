@@ -5,6 +5,7 @@ on:
 
 jobs:
   package:
+    name: Package FPM
     runs-on: ubuntu-latest
     strategy:
       matrix:
