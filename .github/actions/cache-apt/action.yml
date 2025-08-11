@@ -13,6 +13,14 @@ runs:
       id=$(whoami)
       sudo chown ${id} /var/cache/apt/archives
       sudo chown ${id} /var/lib/apt/lists
+  
+  - name: Compute cache key
+    id: key
+    shell: bash
+    run: |
+      hash="$(echo "${{ inputs.packages }}" | sha256sum | cut -f 1 -d ' ')"
+
+      echo "hash=${hash}" >> $GITHUB_OUTPUTS
 
   - name: Restore cache
     uses: actions/cache/restore@v4
@@ -24,7 +32,7 @@ runs:
         /var/cache/apt/archives/*.deb
         /var/lib/apt/lists/*InRelease*
         /var/lib/apt/lists/*Packages*
-      key: ${{ runner.os }}-apt-cache
+      key: apt-cache-${{ steps.key.outputs.hash }}
   
   - name: Revert permissions change
     shell: bash
