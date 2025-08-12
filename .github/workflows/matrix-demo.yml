@@ -8,12 +8,13 @@ jobs:
     name: Demo
     runs-on: ubuntu-latest
 
-    outputs:
-      data: ${{ steps.setter.outputs.* }}
-
     strategy:
       matrix:
         foo: [ one, two, three ]
+
+    outputs:
+      data: ${{ toJSON(steps.setter.outputs.*) }}
+      job-${{ strategy.job-index }}: ${{ toJSON(steps.setter.outputs.*) }}
 
     steps:
       - name: "Go: ${{ matrix.foo }}"
