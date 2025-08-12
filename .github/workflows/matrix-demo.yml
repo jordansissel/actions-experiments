@@ -1,0 +1,34 @@
+name: matrix demo
+
+on:
+  workflow_dispatch:
+
+jobs:
+  demo:
+    name: Demo
+    runs-on: ubuntu-latest
+
+    outputs:
+      data-${{ matrix.foo }}: ${{ steps.setter.outputs.foo }}
+
+    strategy:
+      matrix:
+        foo: [ one, two, three ]
+
+    steps:
+      - name: "Go: ${{ matrix.foo }}"
+        id: setter
+        run: |
+          echo "foo=${{ matrix.foo }}"
+  
+  summary:
+    name: summary
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: summary
+        run: |
+          echo "OK?"
+
+          echo "${{ toJSON(jobs.demo.outputs.*) }}"
+
