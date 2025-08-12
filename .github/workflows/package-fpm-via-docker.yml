@@ -16,6 +16,13 @@ jobs:
         version: [ 1.16.0 ]
         image: [ "rockylinux:9", "fedora:42", "ubuntu:24.04", "ubuntu:22.04", "debian:11", "debian:12" ]
 
+    env:
+      # docker/build-push-action is documented to output an 'imageid', but in
+      # practice, it seems to only output 'metadata' and nothing else
+      # So, in order to know what docker image we just built, we gotta name it with a tag.
+      # Reference: https://github.com/docker/build-push-action/issues/1209
+      TARGET_TAG: "lolcomputers"
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -36,8 +43,7 @@ jobs:
         with:
           context: fpm
           push: false
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${env.TARGET_TAG}
           build-args: |
             IMAGE=${{ matrix.image }}
           cache-from: type=gha
@@ -48,11 +54,7 @@ jobs:
         run: |
           # Extract content from the docker image built in the previous step
 
-          echo "=== docker step outputs"
-          echo "${{ toJSON(steps.container.outputs) }}"
-          echo "=== end
-
-          docker run ${{ steps.container.outputs.imageid }} tar -zc target | tar -zvx | tee files
+          docker run ${{ env.TARGET_TAG }} tar -zc target | tar -zvx | tee files
 
           (
             echo "files<<FILES"
