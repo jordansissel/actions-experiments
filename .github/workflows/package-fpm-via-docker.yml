@@ -70,9 +70,7 @@ jobs:
         run: |
           # Extract content from the docker image built in the previous step
 
-          #docker run ${{ env.TARGET_TAG }} tar -zc -C target . | tar -zvx | tee files
           docker run ${{ env.TARGET_TAG }} sh -c 'cd target; tar -zc *' | tar -zvx | tee files
-          #docker run ${{ env.TARGET_TAG }} tar -zc -C target . | tar -zvx --strip-components=1 --show-transformed-names | tee files
 
           (
             echo "files<<FILES"
@@ -107,10 +105,11 @@ jobs:
           cat package.json
           echo ---
 
-          docker run --workdir /tmp \
-            --volume="./fpm/verify.sh:/tmp/verify.sh:z" \
-            --volume="./target:/tmp/target:z" \
-            ${{ matrix.image }} sh -x /tmp/verify.sh /tmp/target/
+          package="${{ steps.package.outputs.files }}"
+
+          docker run --workdir /tmp/workdir \
+            --volume="./:/tmp/workdir:z" \
+            ${{ matrix.image }} sh -x fpm/verify.sh "${package}""
 
       - name: Upload Artifact
         id: upload
