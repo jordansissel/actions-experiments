@@ -44,7 +44,7 @@ jobs:
           path: ${{ runner.temp }}/artifacts
 
       - name: Job Setup
-        uses: ${{ github.repository }}/.github/actions/cache-apt@main
+        uses: jordansissel/actions-experiments/.github/actions/cache-apt@main
         with:
           packages: reprepro gnupg debsigs createrepo-c
 
