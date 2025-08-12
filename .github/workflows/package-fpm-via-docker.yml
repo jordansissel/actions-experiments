@@ -95,6 +95,11 @@ jobs:
           echo "system-id=$(osrel ID)" >> $GITHUB_OUTPUT
           echo "system-version=$(osrel VERSION_ID)" >> $GITHUB_OUTPUT
 
+      - name: Write metadata
+        run: |
+          echo '${{ toJSON(steps.package.outputs) }}' > package.json
+
+
       - name: "Verify package works"
         run: |
           echo "> Package file: ${{ steps.package.outputs.files }}"
@@ -109,7 +114,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.package.outputs.artifact-name }}
-          path: ${{ steps.package.outputs.files }}
+          path: |
+            ${{ steps.package.outputs.files }}
+            package.json
 
   check-artifacts:
     name: 📦 Checking Artifacts
