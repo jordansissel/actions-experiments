@@ -106,7 +106,7 @@ jobs:
                 fi
                 ;;
               *)
-                echo "Problem: Unexpected distro name: "$system_id"
+                echo "Problem: Unexpected distro name: $system_id"
                 exit 1
                 ;;
             esac
