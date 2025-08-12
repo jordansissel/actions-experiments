@@ -64,6 +64,10 @@ jobs:
             echo "FILES"
           ) >> $GITHUB_OUTPUT
 
+          name="${{ matrix.image }}"
+          # Can't use colons in GHA artifact names, so replace : with -
+          echo "artifact-name=${name/:/-}" >> $GITHUB_OUTPUT
+
       - name: "Verify package works"
         run: |
           echo "> Package file: ${{ steps.package.outputs.files }}"
@@ -76,5 +80,5 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.image }}
+          name: ${{ steps.package.outputs.artifact-name }}
           path: ${{ steps.package.outputs.files }}
