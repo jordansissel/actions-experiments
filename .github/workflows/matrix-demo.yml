@@ -14,7 +14,7 @@ jobs:
 
     outputs:
       data: ${{ toJSON(steps.setter.outputs.*) }}
-      job-${{ strategy.job-index }}: ${{ toJSON(steps.setter.outputs.*) }}
+      #job-${{ strategy.job-index }}: ${{ toJSON(steps.setter.outputs.*) }}
 
     steps:
       - name: "Go: ${{ matrix.foo }}"
