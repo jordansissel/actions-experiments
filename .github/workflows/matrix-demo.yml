@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      data-${{ matrix.foo }}: ${{ steps.setter.outputs.foo }}
+      data: ${{ steps.setter.outputs.foo* }}
 
     strategy:
       matrix:
@@ -19,16 +19,16 @@ jobs:
       - name: "Go: ${{ matrix.foo }}"
         id: setter
         run: |
-          echo "foo=${{ matrix.foo }}"
+          echo "foo-${{ matrix.index }}=${{ matrix.foo }}"
   
   summary:
+    needs: [ demo ]
     name: summary
     runs-on: ubuntu-latest
 
     steps:
       - name: summary
         run: |
-          echo "OK?"
-
-          echo "${{ toJSON(jobs.demo.outputs.*) }}"
+          echo "Demo outputs"
+          echo "${{ toJSON(needs.demo.outputs) }}"
 
