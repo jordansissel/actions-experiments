@@ -31,6 +31,7 @@ jobs:
       DOCKER_BUILD_RECORD_UPLOAD: false
 
     outputs:
+      files: ${{ steps.package.outputs.files }}
       system-id: ${{ steps.package.outputs.system-id }}
       system-version: ${{ steps.package.outputs.system-version }}
       artifact-id: ${{ steps.upload.outputs.artifact-id }}
