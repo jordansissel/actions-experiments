@@ -107,6 +107,12 @@ jobs:
 
           package="${{ steps.package.outputs.files }}"
 
+          echo "PWD: "
+          pwd
+
+          echo "Files: "
+          ls -l
+
           docker run --workdir /tmp/workdir \
             --volume="./:/tmp/workdir:z" \
             ${{ matrix.image }} sh -x fpm/verify.sh "${package}"

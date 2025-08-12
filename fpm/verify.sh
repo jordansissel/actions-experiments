@@ -13,6 +13,11 @@ setup() {
   ID="$(osrel ID)"
   VERSION="$(osrel VERSION_ID)"
 
+  if [ ! -f "$1" ] ; then
+    echo "ERROR: Cannot install package because the file doesn't exist: $1"
+    exit 1
+  fi
+
   echo "[Detected OS: $ID $VERSION]"
   case "${ID}" in
     ubuntu|debian) 
