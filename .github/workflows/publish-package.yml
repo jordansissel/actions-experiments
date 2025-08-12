@@ -54,9 +54,9 @@ jobs:
             echo $artifact
             cat $artifact
             echo 
-            files="$(jq '.files' < $artifact)"
-            system_id="$(jq '.system_id' < $artifact)"
-            system_version="$(jq '.system_version' < $artifact)"
+            files="$(jq -r '.files' < $artifact)"
+            system_id="$(jq -r '.system_id' < $artifact)"
+            system_version="$(jq -r '.system_version' < $artifact)"
             repo="repository/${system_id}/${system_version}/"
 
             name="${system_id}-${system_version}"
