@@ -19,7 +19,7 @@ jobs:
       - name: "Go: ${{ matrix.foo }}"
         id: setter
         run: |
-          echo "foo-${{ matrix.index }}=${{ matrix.foo }}"
+          echo "foo-${{ strategy.job-index }}=${{ matrix.foo }}"
   
   summary:
     needs: [ demo ]
