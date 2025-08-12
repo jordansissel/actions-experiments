@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      data: ${{ steps.setter.outputs.foo* }}
+      data: ${{ steps.setter.outputs.* }}
 
     strategy:
       matrix:
