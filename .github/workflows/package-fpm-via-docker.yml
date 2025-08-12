@@ -70,7 +70,9 @@ jobs:
         run: |
           # Extract content from the docker image built in the previous step
 
-          docker run ${{ env.TARGET_TAG }} tar -zc -C target . | tar -zvx | tee files
+          #docker run ${{ env.TARGET_TAG }} tar -zc -C target . | tar -zvx | tee files
+          docker run ${{ env.TARGET_TAG }} sh -c 'cd target; tar -zc *' | tar -zvx | tee files
+          #docker run ${{ env.TARGET_TAG }} tar -zc -C target . | tar -zvx --strip-components=1 --show-transformed-names | tee files
 
           (
             echo "files<<FILES"
@@ -99,10 +101,11 @@ jobs:
         run: |
           echo '${{ toJSON(steps.package.outputs) }}' > package.json
 
-
       - name: "Verify package works"
         run: |
-          echo "> Package file: ${{ steps.package.outputs.files }}"
+          echo "> Package files: ${{ steps.package.outputs.files }}"
+          cat package.json
+          echo ---
 
           docker run --workdir /tmp \
             --volume="./fpm/verify.sh:/tmp/verify.sh:z" \
