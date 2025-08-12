@@ -43,8 +43,9 @@ jobs:
         with:
           context: fpm
           push: false
-          tags: ${env.TARGET_TAG}
+          tags: ${{ env.TARGET_TAG }}
           build-args: |
+            # See fpm/Dockerfile for args
             IMAGE=${{ matrix.image }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
