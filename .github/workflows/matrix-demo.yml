@@ -20,7 +20,7 @@ jobs:
       - name: "Go: ${{ matrix.foo }}"
         id: setter
         run: |
-          echo "foo-${{ strategy.job-index }}=${{ matrix.foo }}"
+          echo "foo-${{ strategy.job-index }}=${{ matrix.foo }}" >> $GITHUB_OUTPUT
   
   summary:
     needs: [ demo ]
