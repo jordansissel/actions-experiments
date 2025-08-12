@@ -1,4 +1,4 @@
-name: Package FPM via docker
+name: FPM → 📦
 
 on:
   workflow_dispatch:
