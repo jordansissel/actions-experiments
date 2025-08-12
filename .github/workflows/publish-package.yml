@@ -8,27 +8,45 @@ on:
         required: true
 
 jobs:
+  configure:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.configuration }}
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Plan Matrix
+        id: matrix
+        run: |
+          (
+            echo "configuration<<JSON"
+            jq -s '{ "include": . }' artifacts/*/package.json
+            echo "JSON\n"
+          }' | tee -a $GITHUB_OUTPUT
+      
   publish:
     permissions:
       contents: write
 
     runs-on: ubuntu-latest
 
+    #needs: [ configure ]
+    #strategy:
+      #matrix: ${{ fromJSON(needs.settings.outputs.matrix) }}
+
     steps:
-      - name: Job Setup
-        uses: ${{ github.repository }}/.github/actions/cache-apt@main
-        with:
-          packages:
-            reprepro gnupg debsigs
-
-      - uses: actions/checkout@v4
-        with:
-          ref: pages
-
       - name: Download Artifacts
         uses: actions/download-artifact@v4
         with:
           path: ${{ runner.temp }}/artifacts
+
+      - name: Job Setup
+        uses: ${{ github.repository }}/.github/actions/cache-apt@main
+        with:
+          packages: reprepro gnupg debsigs createrepo-c
 
       - name: Configure GPG
         env:
@@ -39,25 +57,40 @@ jobs:
           echo "$GPG_PRIVATE_KEY" | gpg --batch --import
           echo "$KEY_ID:6:" | tr -d ' ' | gpg --batch --import-ownertrust --pinentry-mode=loopback
 
-      - name: Sign debs
-        env:
-          KEY_ID: ${{ vars.KEY_ID }}
-        run: |
-          find "${RUNNER_TEMP}/artifacts" -type f -name '*.deb' -print0 | \
-            xargs -0t debsigs -v --gpgopts="--batch --no-tty --pinentry-mode=loopback" --sign=origin --default-key="$KEY_ID" 
+      - uses: actions/checkout@v4
+        with:
+          ref: pages
+
+      # XXX: Signing should happen when the packages are created instead.
+      #- name: Sign debs
+        #env:
+          #KEY_ID: ${{ vars.KEY_ID }}
+        #run: |
+          #find "${RUNNER_TEMP}/artifacts" -type f -name '*.deb' -print0 | \
+            #xargs -0t debsigs -v --gpgopts="--batch --no-tty --pinentry-mode=loopback" --sign=origin --default-key="$KEY_ID" 
 
       - name: Run reprepro
         run: |
-          find "${RUNNER_TEMP}/artifacts" -type f -name '*.deb' -print0 | \
-            xargs -0tn1 reprepro -Vb repo includedeb any
+          for artifact in "${RUNNER_TEMP}/artifacts/"*/package.json ; do
+            echo $artifact
+            cat $artifact
+            echo 
+            # Parse JSON
+            # depending on the platform, run reprepro or createrepo
+            # Repo should be "repository/<system-id>/<system-version>/"
+            # reprepro includedeb will copy the file, but createrepo doesn't copy anything
+          done
+
+            #reprepro -Vb repo includedeb any
+            #createrepo ...
 
       - name: Commit and push
         run: |
           # Need to set git user and email
           # Citation> https://github.com/actions/checkout?tab=readme-ov-file#push-a-commit-using-the-built-in-token
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          #git config user.name "github-actions[bot]"
+          #git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add repo
-          git commit repo -m "reprepro packages"
-          git push
+          #git add repo
+          #git commit repo -m "reprepro packages"
+          #git push
