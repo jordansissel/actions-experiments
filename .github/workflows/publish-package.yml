@@ -8,34 +8,12 @@ on:
         required: true
 
 jobs:
-  configure:
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.matrix.outputs.configuration }}
-    steps:
-      - name: Download Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts
-
-      - name: Plan Matrix
-        id: matrix
-        run: |
-          (
-            echo "configuration<<JSON"
-            jq -s '{ "include": . }' artifacts/*/package.json
-            echo "JSON\n"
-          }' | tee -a $GITHUB_OUTPUT
-      
   publish:
     permissions:
+      # Allow this job to write to the pages branch
       contents: write
 
     runs-on: ubuntu-latest
-
-    #needs: [ configure ]
-    #strategy:
-      #matrix: ${{ fromJSON(needs.settings.outputs.matrix) }}
 
     steps:
       - name: Download Artifacts
@@ -46,7 +24,7 @@ jobs:
       - name: Job Setup
         uses: jordansissel/actions-experiments/.github/actions/cache-apt@main
         with:
-          packages: reprepro gnupg debsigs createrepo-c
+          packages: reprepro gnupg debsigs createrepo-c jq
 
       - name: Configure GPG
         env:
@@ -69,20 +47,72 @@ jobs:
           #find "${RUNNER_TEMP}/artifacts" -type f -name '*.deb' -print0 | \
             #xargs -0t debsigs -v --gpgopts="--batch --no-tty --pinentry-mode=loopback" --sign=origin --default-key="$KEY_ID" 
 
-      - name: Run reprepro
+      - name: Update repositories
         run: |
+          echo "# Package Repository Updates" >> $GITHUB_STEP_SUMMARY
           for artifact in "${RUNNER_TEMP}/artifacts/"*/package.json ; do
             echo $artifact
             cat $artifact
             echo 
-            # Parse JSON
-            # depending on the platform, run reprepro or createrepo
-            # Repo should be "repository/<system-id>/<system-version>/"
-            # reprepro includedeb will copy the file, but createrepo doesn't copy anything
-          done
+            files="$(jq '.files' < $artifact)"
+            system_id="$(jq '.system_id' < $artifact)"
+            system_version="$(jq '.system_version' < $artifact)"
+            repo="repository/${system_id}/${system_version}/"
 
-            #reprepro -Vb repo includedeb any
-            #createrepo ...
+            name="${system_id}-${system_version}"
+
+            source="$(dirname "$artifact")/${files}"
+
+            echo "[ $name ] Processing package: ${files}"
+            case "$system_id" in
+              debian|ubuntu)
+                if [ ! -f "$repo/conf/distributions" ] ; then
+                  echo "Creating apt repo for $name"
+                  [ ! -d "$repo/conf" ] && mkdir -p "$repo/conf"
+                  (
+                    echo "Suite: fpm"
+                    # From Debian Policy:
+                    # > Architecture wildcards are in the format any (which matches every architecture)
+                    echo "Architectures: any"
+                    echo "Components: main"
+                    SignWith: ${{ vars.KEY_ID }}
+                    Origin: the fpm project
+                    Label: fpm
+                    Description: fpm
+                  ) > "$repo/conf/distribution" || exit 1
+                fi
+
+                # reprepro includedeb will copy the file into the repo for us
+                if ! reprepro -Vb "$repo" includedeb "$source" ; then
+                  echo "::error ::reprepro failed on $repo"
+                  exit 1
+                fi
+                ;;
+              rocky|almalinux|fedora)
+                [ ! -d "$repo/packages" ] && mkdir -p "$repo/packages"
+
+                destination="$repo/packages/$files"
+                if [ -f "$repo/packages/$files" ] ; then
+                  echo "Problem: File already exists in repo. Refusing to proceed."
+                  exit 1
+                else
+                  cp -v --preserve=timestamps "$source"  "$destination"
+                fi
+                
+                if ! createrepo_c -v "$repo" ; then
+                  echo "Problem: createrepo failed on repo: $repo"
+                  echo "::error ::createrepo failed on $repo"
+                  exit 1
+                fi
+                ;;
+              *)
+                echo "Problem: Unexpected distro name: "$system_id"
+                exit 1
+                ;;
+            esac
+
+            echo "* $name - Added to repository: $files" >> $GITHUB_STEP_SUMMARY
+          done
 
       - name: Commit and push
         run: |
