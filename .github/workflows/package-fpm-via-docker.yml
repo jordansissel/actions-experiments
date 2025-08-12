@@ -30,6 +30,12 @@ jobs:
       # This job doesn't publish the docker image so there's no need for any kind of record uploading
       DOCKER_BUILD_RECORD_UPLOAD: false
 
+    outputs:
+      system-id: ${{ steps.package.outputs.system-id }}
+      system-version: ${{ steps.package.outputs.system-version }}
+      artifact-id: ${{ steps.upload.outputs.artifact-id }}
+      artifact-url: ${{ steps.upload.outputs.artifact-url }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -75,6 +81,19 @@ jobs:
           # Can't use colons in GHA artifact names, so replace : with -
           echo "artifact-name=${name/:/-}" >> $GITHUB_OUTPUT
 
+          osrel() {
+            field="$1"
+            line="$(grep "^${field}=" os-release)"
+
+            # Turn FOO="value" into just value
+            echo "${line#${field}=}" | sed -re 's/^"|"$//g'
+          }
+
+          docker run ${{ env.TARGET_TAG }} cat /etc/os-release > os-release
+
+          echo "system-id=$(osrel ID)" >> $GITHUB_OUTPUT
+          echo "system-version=$(osrel VERSION_ID)" >> $GITHUB_OUTPUT
+
       - name: "Verify package works"
         run: |
           echo "> Package file: ${{ steps.package.outputs.files }}"
@@ -85,6 +104,7 @@ jobs:
             ${{ matrix.image }} sh -x /tmp/verify.sh /tmp/target/
 
       - name: Upload Artifact
+        id: upload
         uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.package.outputs.artifact-name }}
