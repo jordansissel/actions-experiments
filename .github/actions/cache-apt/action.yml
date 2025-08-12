@@ -1,8 +1,11 @@
 name: Cache APT operations
+description: |
+  Caches results of apt-get update and apt-get install in hopes of making package installation faster.
+
 inputs:
   packages:
     required: true
-    type: string
+    description: Space-delimited list of package names to install
 
 runs:
   using: composite
