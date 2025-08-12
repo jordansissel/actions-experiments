@@ -70,7 +70,7 @@ jobs:
         run: |
           # Extract content from the docker image built in the previous step
 
-          docker run ${{ env.TARGET_TAG }} tar -zc target | tar -zvx | tee files
+          docker run ${{ env.TARGET_TAG }} tar -zc -C target . | tar -zvx | tee files
 
           (
             echo "files<<FILES"
