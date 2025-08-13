@@ -63,6 +63,7 @@ jobs:
             files="$(jq -r '.files' < $artifact)"
             system_id="$(jq -r '.system_id' < $artifact)"
             system_version="$(jq -r '.system_version' < $artifact)"
+            system_codename="$(jq -r '.system_codename' < $artifact)"
             repo="repository/${system_id}/${system_version}/"
 
             name="${system_id}-${system_version}"
@@ -76,10 +77,8 @@ jobs:
                   echo "Creating apt repo for $name"
                   [ ! -d "$repo/conf" ] && mkdir -p "$repo/conf"
                   (
-                    echo "Suite: fpm"
-                    # From Debian Policy:
-                    # > Architecture wildcards are in the format any (which matches every architecture)
-                    echo "Architectures: any"
+                    echo "Codename: "
+                    echo "Architectures: amd64 arm64 i386"
                     echo "Components: main"
                     echo "SignWith: ${{ steps.gpg.outputs.KEY_ID }}"
                     echo "Origin: the fpm project"
@@ -88,8 +87,13 @@ jobs:
                   ) > "$repo/conf/distribution" || exit 1
                 fi
 
+                # Ensure the reprepro config knows about the codename for this package
+                if ! sed -ne 's/^Codename: *//p' "$repo/conf/distributions" | fmt -1 | grep -iF FOO ; then
+                  sed -ie "s/^Codename:.*/\0 ${system_codename}/" "$repo/conf/distributions"
+                fi
+
                 # reprepro includedeb will copy the file into the repo for us
-                if ! reprepro -Vb includedeb "$repo" "$source" ; then
+                if ! reprepro -Vb "$repo" includedeb "$system_codename" "$source" ; then
                   echo "::error ::reprepro failed on $repo"
                   exit 1
                 fi

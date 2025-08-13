@@ -95,6 +95,10 @@ jobs:
           echo "system_id=$(osrel ID)" >> $GITHUB_OUTPUT
           echo "system_version=$(osrel VERSION_ID)" >> $GITHUB_OUTPUT
 
+          # Get the codename, mostly for Debian/Ubuntu systems.
+          # This value gets used in naming the package repository later.
+          echo "system_codename=$(osrel VERSION_CODENAME)" >> $GITHUB_OUTPUT
+
       - name: Write metadata
         run: |
           echo '${{ toJSON(steps.package.outputs) }}' > package.json
