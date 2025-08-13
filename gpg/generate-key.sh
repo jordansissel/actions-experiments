@@ -23,7 +23,4 @@ echo
 gpg --homedir "$tmp" --armor --export-secret-keys "$email"
 echo
 
-echo -n "Key ID: "
-gpg --homedir "$tmp" --quiet --list-keys --list-options show-only-fpr-mbox "$email" | awk '{print $1}'
-
 [ -d "$tmp" ] && rm -r "$tmp"
