@@ -64,15 +64,13 @@ jobs:
             system_id="$(jq -r '.system_id' < $artifact)"
             system_version="$(jq -r '.system_version' < $artifact)"
             system_codename="$(jq -r '.system_codename' < $artifact)"
-            repo="repository/${system_id}/${system_version}/"
-
-            name="${system_id}-${system_version}"
 
             source="$(dirname "$artifact")/${files}"
 
             echo "[ $name ] Processing package: ${files}"
             case "$system_id" in
               debian|ubuntu)
+                repo="repository/"
                 if [ ! -f "$repo/conf/distributions" ] ; then
                   echo "Creating apt repo for $name"
                   [ ! -d "$repo/conf" ] && mkdir -p "$repo/conf"
@@ -84,7 +82,7 @@ jobs:
                     echo "Origin: the fpm project"
                     echo "Label: fpm"
                     echo "Description: fpm"
-                  ) > "$repo/conf/distribution" || exit 1
+                  ) > "$repo/conf/distributions" || exit 1
                 fi
 
                 # Ensure the reprepro config knows about the codename for this package
@@ -99,6 +97,8 @@ jobs:
                 fi
                 ;;
               rocky|almalinux|fedora)
+                repo="repository/${system_id}/${system_version}"
+
                 [ ! -d "$repo/packages" ] && mkdir -p "$repo/packages"
 
                 destination="$repo/packages/$files"
@@ -117,6 +117,7 @@ jobs:
                 ;;
               *)
                 echo "Problem: Unexpected distro name: $system_id"
+                cat $artifact
                 exit 1
                 ;;
             esac
