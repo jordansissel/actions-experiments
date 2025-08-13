@@ -75,10 +75,10 @@ jobs:
                     # > Architecture wildcards are in the format any (which matches every architecture)
                     echo "Architectures: any"
                     echo "Components: main"
-                    SignWith: ${{ vars.KEY_ID }}
-                    Origin: the fpm project
-                    Label: fpm
-                    Description: fpm
+                    echo "SignWith: ${{ vars.KEY_ID }}"
+                    echo "Origin: the fpm project"
+                    echo "Label: fpm"
+                    echo "Description: fpm"
                   ) > "$repo/conf/distribution" || exit 1
                 fi
 
