@@ -54,6 +54,7 @@ jobs:
 
       - name: Update repositories
         run: |
+          set -x
           echo "# Package Repository Updates" >> $GITHUB_STEP_SUMMARY
           for artifact in "${RUNNER_TEMP}/artifacts/"*/package.json ; do
             echo $artifact
