@@ -71,24 +71,27 @@ jobs:
             case "$system_id" in
               debian|ubuntu)
                 repo="repository/"
-                if [ ! -f "$repo/conf/distributions" ] ; then
-                  echo "Creating apt repo for $name"
+                #if [ ! -f "$repo/conf/distributions" ] ; then
+                if ! grep -q "Codename: $system_codename" "$repo/conf/distributions" ; then
                   [ ! -d "$repo/conf" ] && mkdir -p "$repo/conf"
+
+                  # Append to the distributions file
                   (
-                    echo "Codename: "
+                    echo "Codename: $system_codename"
                     echo "Architectures: amd64 arm64 i386"
                     echo "Components: main"
                     echo "SignWith: ${{ steps.gpg.outputs.KEY_ID }}"
                     echo "Origin: the fpm project"
                     echo "Label: fpm"
                     echo "Description: fpm"
-                  ) > "$repo/conf/distributions" || exit 1
+                    echo
+                  ) >> "$repo/conf/distributions" || exit 1
                 fi
 
-                # Ensure the reprepro config knows about the codename for this package
-                if ! sed -ne 's/^Codename: *//p' "$repo/conf/distributions" | fmt -1 | grep -iF FOO ; then
-                  sed -ie "s/^Codename:.*/\0 ${system_codename}/" "$repo/conf/distributions"
-                fi
+                ## Ensure the reprepro config knows about the codename for this package
+                #if ! sed -ne 's/^Codename: *//p' "$repo/conf/distributions" | fmt -1 | grep -iF FOO ; then
+                  #sed -ie "s/^Codename:.*/\0 ${system_codename}/" "$repo/conf/distributions"
+                #fi
 
                 # reprepro includedeb will copy the file into the repo for us
                 if ! reprepro -Vb "$repo" includedeb "$system_codename" "$source" ; then
