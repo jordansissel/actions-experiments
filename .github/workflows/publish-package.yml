@@ -26,6 +26,10 @@ jobs:
         with:
           packages: reprepro gnupg debsigs createrepo-c jq
 
+      - uses: actions/checkout@v4
+        with:
+          ref: pages
+
       - name: Configure GPG
         id: gpg
         env:
@@ -38,10 +42,13 @@ jobs:
           KEY_ID="$(cut -f 1 -d ' ' < gpg.out)"
           echo "KEY_ID=$KEY_ID" >> $GITHUB_OUTPUT
 
-      - uses: actions/checkout@v4
-        with:
-          ref: pages
-
+          # Ensure the gpg pubkey is available
+          gpg --armor --export "$KEY_ID" > gpg
+          if ! git diff --name-only --exit-code gpg  ; then
+            echo "Updating GPG public key"
+            git commit gpg -m "Updating public key. Key ID: ${KEY_ID}"
+          fi
+  
       - name: Update repositories
         env:
           KEY_ID: ${{ steps.gpg.outputs.KEY_ID }}
