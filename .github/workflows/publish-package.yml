@@ -38,28 +38,17 @@ jobs:
           KEY_ID="$(cut -f 1 -d ' ' < gpg.out)"
           echo "KEY_ID=$KEY_ID" >> $GITHUB_OUTPUT
 
-          #echo "$KEY_ID:6:" | tr -d ' ' | gpg --batch --import-ownertrust --pinentry-mode=loopback
-
       - uses: actions/checkout@v4
         with:
           ref: pages
 
-      # XXX: Signing should happen when the packages are created instead.
-      #- name: Sign debs
-        #env:
-          #KEY_ID: ${{ steps.gpg.outputs.KEY_ID }}
-        #run: |
-          #find "${RUNNER_TEMP}/artifacts" -type f -name '*.deb' -print0 | \
-            #xargs -0t debsigs -v --gpgopts="--batch --no-tty --pinentry-mode=loopback" --sign=origin --default-key="$KEY_ID" 
-
       - name: Update repositories
+        env:
+          KEY_ID: ${{ steps.gpg.outputs.KEY_ID }}
         run: |
           set -x
           echo "# Package Repository Updates" >> $GITHUB_STEP_SUMMARY
           for artifact in "${RUNNER_TEMP}/artifacts/"*/package.json ; do
-            echo $artifact
-            cat $artifact
-            echo 
             files="$(jq -r '.files' < $artifact)"
             system_id="$(jq -r '.system_id' < $artifact)"
             system_version="$(jq -r '.system_version' < $artifact)"
@@ -71,7 +60,6 @@ jobs:
             case "$system_id" in
               debian|ubuntu)
                 repo="repository/${system_id}/${system_version}"
-                #if [ ! -f "$repo/conf/distributions" ] ; then
                 if ! grep -q "Codename: $system_codename" "$repo/conf/distributions" ; then
                   [ ! -d "$repo/conf" ] && mkdir -p "$repo/conf"
 
@@ -80,13 +68,16 @@ jobs:
                     echo "Codename: $system_codename"
                     echo "Architectures: amd64 arm64 i386"
                     echo "Components: main"
-                    echo "SignWith: ${{ steps.gpg.outputs.KEY_ID }}"
+                    echo "SignWith: $KEY_ID"
                     echo "Origin: the fpm project"
                     echo "Label: fpm"
                     echo "Description: fpm"
                     echo
                   ) >> "$repo/conf/distributions" || exit 1
                 fi
+
+                echo "=> Signing deb"
+                debsigs -v --gpgopts="--batch --no-tty --pinentry-mode=loopback" --sign=origin --default-key="$KEY_ID"  "$source" || exit 1
 
                 # reprepro includedeb will copy the file into the repo for us
                 if ! reprepro -Vb "$repo" includedeb "$system_codename" "$source" ; then
@@ -106,6 +97,9 @@ jobs:
                 else
                   cp -v --preserve=timestamps "$source"  "$destination"
                 fi
+
+                echo "=> Signing RPM"
+                rpmsign --verbose --define "%_gpg_name $KEY_ID" --addsign "$destination"
                 
                 if ! createrepo_c -v "$repo" ; then
                   echo "Problem: createrepo failed on repo: $repo"
