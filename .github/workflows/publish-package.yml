@@ -27,13 +27,18 @@ jobs:
           packages: reprepro gnupg debsigs createrepo-c jq
 
       - name: Configure GPG
+        id: gpg
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-          KEY_ID: ${{ vars.KEY_ID }}
         run: |
           echo "::add-mask::$GPG_PRIVATE_KEY"
-          echo "$GPG_PRIVATE_KEY" | gpg --batch --import
-          echo "$KEY_ID:6:" | tr -d ' ' | gpg --batch --import-ownertrust --pinentry-mode=loopback
+          # Import the gpg key and output the fingerprint that we'll need for key signing later.
+          echo "$GPG_PRIVATE_KEY" | gpg --batch --import --import-options import-show --list-options show-only-fpr-mbox  > gpg.out
+
+          KEY_ID="$(cut -f 1 -d ' ' < gpg.out)"
+          echo "KEY_ID=$KEY_ID" >> $GITHUB_OUTPUT
+
+          #echo "$KEY_ID:6:" | tr -d ' ' | gpg --batch --import-ownertrust --pinentry-mode=loopback
 
       - uses: actions/checkout@v4
         with:
@@ -42,7 +47,7 @@ jobs:
       # XXX: Signing should happen when the packages are created instead.
       #- name: Sign debs
         #env:
-          #KEY_ID: ${{ vars.KEY_ID }}
+          #KEY_ID: ${{ steps.gpg.outputs.KEY_ID }}
         #run: |
           #find "${RUNNER_TEMP}/artifacts" -type f -name '*.deb' -print0 | \
             #xargs -0t debsigs -v --gpgopts="--batch --no-tty --pinentry-mode=loopback" --sign=origin --default-key="$KEY_ID" 
@@ -75,7 +80,7 @@ jobs:
                     # > Architecture wildcards are in the format any (which matches every architecture)
                     echo "Architectures: any"
                     echo "Components: main"
-                    echo "SignWith: ${{ vars.KEY_ID }}"
+                    echo "SignWith: ${{ steps.gpg.outputs.KEY_ID }}"
                     echo "Origin: the fpm project"
                     echo "Label: fpm"
                     echo "Description: fpm"
