@@ -1,4 +1,4 @@
-name: FPM → 📦
+name: 📦 FPM - Multiple Platforms
 
 on:
   workflow_dispatch:
@@ -65,6 +65,7 @@ jobs:
           tags: ${{ env.TARGET_TAG }}
           build-args: |
             IMAGE=${{ matrix.image }}
+            FPM_VERSION=${{ matrix.version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           # Try to push this to the local node's docker images?
