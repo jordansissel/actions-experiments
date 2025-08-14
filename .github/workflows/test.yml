@@ -1,0 +1,11 @@
+name: Test action secrets
+
+on:
+  workflow_dispatch:
+
+jobs:
+  example:
+    runs-on: ubuntu-latest
+    steps:
+    - name: maybe
+      uses: ./.github/actions/publish-packages
