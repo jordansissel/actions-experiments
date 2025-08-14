@@ -11,6 +11,6 @@ jobs:
       uses: actions/checkout@v4
 
     - name: maybe
-      uses: ./.github/action/publish-packages
+      uses: ./.github/actions/publish-packages
       with:
         GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
