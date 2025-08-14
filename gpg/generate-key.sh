@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 if [ -z "$1" ] ; then
   echo "Usage: $0 <email>"
   echo
@@ -23,4 +25,9 @@ echo
 gpg --homedir "$tmp" --armor --export-secret-keys "$email"
 echo
 
-[ -d "$tmp" ] && rm -r "$tmp"
+rm -r "$tmp/openpgp-revocs.d"
+rm -r "$tmp/private-keys-v1.d"
+rm "$tmp/pubring.kbx"
+rm "$tmp/pubring.kbx~"
+rm "$tmp/trustdb.gpg"
+rmdir "$tmp"
