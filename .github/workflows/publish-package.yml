@@ -91,6 +91,14 @@ jobs:
                 debsigs -v --gpgopts="--batch --no-tty --pinentry-mode=loopback" --sign=origin --default-key="$KEY_ID"  "$source" || exit 1
 
                 # reprepro includedeb will copy the file into the repo for us
+                # The path is based in the package name, like: pool/f/foo/foo_123_all.deb
+                destination="$repo/pool/$(printf %c $files)/${files%%_*}/$files"
+                if [ -f "$destination" ] ; then
+                  echo "Cannot proceed, this package already exists in the repository: $destination"
+                  echo "::error ::The package already exists in the $system_id $system_version repository: $files (as $destination)"
+                  exit 1
+                fi
+
                 if ! reprepro -Vb "$repo" includedeb "$system_codename" "$source" ; then
                   echo "::error ::reprepro failed on $repo"
                   exit 1
@@ -102,8 +110,8 @@ jobs:
                 [ ! -d "$repo/packages" ] && mkdir -p "$repo/packages"
 
                 destination="$repo/packages/$files"
-                if [ -f "$repo/packages/$files" ] ; then
-                  echo "Problem: File already exists in repo. Refusing to proceed."
+                if [ -f "$destination" ] ; then
+                  echo "::error ::The package already exists in the $system_id $system_version repository: $files (as $destination)"
                   exit 1
                 else
                   cp -v --preserve=timestamps "$source"  "$destination"
