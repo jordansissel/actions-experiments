@@ -79,6 +79,7 @@ jobs:
                     echo "Codename: $system_codename"
                     echo "Architectures: amd64 arm64 i386"
                     echo "Components: main"
+                    echo "Suite: stable"
                     echo "SignWith: $KEY_ID"
                     echo "Origin: the fpm project"
                     echo "Label: fpm"
