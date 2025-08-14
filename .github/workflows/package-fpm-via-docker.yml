@@ -2,6 +2,10 @@ name: FPM → 📦
 
 on:
   workflow_dispatch:
+    inputs:
+      version: 
+        default: "1.16.0"
+        description: The version of FPM to package
 
 env:
   registry: ghcr.io
@@ -13,7 +17,8 @@ jobs:
 
     strategy:
       matrix:
-        version: [ 1.16.0 ]
+        version: 
+          - ${{ inputs.version }}
         image: [ "rockylinux:9", "fedora:42", "ubuntu:24.04", "ubuntu:22.04", "debian:11", "debian:12" ]
 
     env:
