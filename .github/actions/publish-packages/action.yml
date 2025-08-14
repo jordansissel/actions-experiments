@@ -1,12 +1,15 @@
 name: Publish
 description: Publish packages to github
 
-#inputs:
+inputs:
+  GPG_PRIVATE_KEY:
+    required: true
+    description: "The gpg private key, in armored format, to use for signing packages and repositories"
 
 runs:
   using: composite
   steps:
     - name: testing secrets
+      shell: bash
       run: |
-        echo "::add-mask::${{ secrets.GPG_PRIVATE_KEY }}"
-        echo "OK?"
+        echo "${{ inputs.GPG_PRIVATE_KEY }}"
