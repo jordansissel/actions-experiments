@@ -49,6 +49,10 @@ jobs:
             git commit gpg -m "Updating public key. Key ID: ${KEY_ID}"
           fi
   
+      - uses: actions/checkout@v4
+        with:
+          ref: pages
+
       - name: Update repositories
         env:
           KEY_ID: ${{ steps.gpg.outputs.KEY_ID }}
