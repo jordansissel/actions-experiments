@@ -3,10 +3,10 @@
 set -e
 
 if [ -z "$1" ] ; then
-  echo "Usage: $0 <email>"
-  echo
-  echo "This will create a new pgp key for the given email"
-  echo "and will output the public and private keys"
+  echo "Usage: $0 <email>" >&2
+  echo >&2
+  echo "This will create a new pgp key for the given email" >&2
+  echo "and will output the public and private keys" >&2
   exit 1
 fi
 
