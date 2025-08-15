@@ -49,6 +49,7 @@ jobs:
           sh code/repo/update.sh ./artifacts ./pages
 
       - name: Commit and push
+        working-directory: pages
         run: |
           # Need to set git user and email
           # Citation> https://github.com/actions/checkout?tab=readme-ov-file#push-a-commit-using-the-built-in-token
