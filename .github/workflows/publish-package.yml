@@ -16,19 +16,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Download Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: ${{ runner.temp }}/artifacts
-
       - name: Job Setup
         uses: jordansissel/actions-experiments/.github/actions/cache-apt@main
         with:
-          packages: reprepro gnupg debsigs createrepo-c jq
-
-      - uses: actions/checkout@v4
-        with:
-          ref: pages
+          packages: reprepro gnupg debsigs createrepo-c rpm jq
 
       - name: Configure GPG
         id: gpg
@@ -43,107 +34,41 @@ jobs:
           echo "KEY_ID=$KEY_ID" >> $GITHUB_OUTPUT
 
           # Ensure the gpg pubkey is available
-          gpg --armor --export "$KEY_ID" > gpg
-          if ! git diff --name-only --exit-code gpg  ; then
-            echo "Updating GPG public key"
-            git commit gpg -m "Updating public key. Key ID: ${KEY_ID}"
-          fi
+          #gpg --armor --export "$KEY_ID" > gpg
+          #if ! git diff --name-only --exit-code gpg  ; then
+            #echo "Updating GPG public key"
+            #git commit gpg -m "Updating public key. Key ID: ${KEY_ID}"
+          #fi
   
       - uses: actions/checkout@v4
         with:
           ref: pages
+          path: pages
 
-      - name: Update repositories
+      - uses: actions/checkout@v4
+        with:
+          path: code
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Update packate repositories
         env:
           KEY_ID: ${{ steps.gpg.outputs.KEY_ID }}
         run: |
-          set -x
-          echo "# Package Repository Updates" >> $GITHUB_STEP_SUMMARY
-          for artifact in "${RUNNER_TEMP}/artifacts/"*/package.json ; do
-            files="$(jq -r '.files' < $artifact)"
-            system_id="$(jq -r '.system_id' < $artifact)"
-            system_version="$(jq -r '.system_version' < $artifact)"
-            system_codename="$(jq -r '.system_codename' < $artifact)"
+          find ./artifacts
+          echo ===
+          sh code/repo/update.sh ./artifacts ./pages
 
-            source="$(dirname "$artifact")/${files}"
-
-            echo "[ $system_id $system_version ] Processing package: ${files}"
-            case "$system_id" in
-              debian|ubuntu)
-                repo="repository/${system_id}/${system_version}"
-                if ! grep -q "Codename: $system_codename" "$repo/conf/distributions" ; then
-                  [ ! -d "$repo/conf" ] && mkdir -p "$repo/conf"
-
-                  # Add the codename to the distributions file
-                  (
-                    echo "Codename: $system_codename"
-                    echo "Architectures: amd64 arm64 i386"
-                    echo "Components: main"
-                    echo "Suite: stable"
-                    echo "SignWith: $KEY_ID"
-                    echo "Origin: the fpm project"
-                    echo "Label: fpm"
-                    echo "Description: fpm"
-                    echo
-                  ) >> "$repo/conf/distributions" || exit 1
-                fi
-
-                echo "=> Signing deb"
-                debsigs -v --gpgopts="--batch --no-tty --pinentry-mode=loopback" --sign=origin --default-key="$KEY_ID"  "$source" || exit 1
-
-                # reprepro includedeb will copy the file into the repo for us
-                # The path is based in the package name, like: pool/f/foo/foo_123_all.deb
-                destination="$repo/pool/$(printf %c $files)/${files%%_*}/$files"
-                if [ -f "$destination" ] ; then
-                  echo "Cannot proceed, this package already exists in the repository: $destination"
-                  echo "::error ::The package already exists in the $system_id $system_version repository: $files (as $destination)"
-                  exit 1
-                fi
-
-                if ! reprepro -Vb "$repo" includedeb "$system_codename" "$source" ; then
-                  echo "::error ::reprepro failed on $repo"
-                  exit 1
-                fi
-                ;;
-              rocky|almalinux|fedora)
-                repo="repository/${system_id}/${system_version}"
-
-                [ ! -d "$repo/packages" ] && mkdir -p "$repo/packages"
-
-                destination="$repo/packages/$files"
-                if [ -f "$destination" ] ; then
-                  echo "::error ::The package already exists in the $system_id $system_version repository: $files (as $destination)"
-                  exit 1
-                else
-                  cp -v --preserve=timestamps "$source"  "$destination"
-                fi
-
-                echo "=> Signing RPM"
-                rpmsign --verbose --define "%_gpg_name $KEY_ID" --addsign "$destination"
-                
-                if ! createrepo_c -v "$repo" ; then
-                  echo "Problem: createrepo failed on repo: $repo"
-                  echo "::error ::createrepo failed on $repo"
-                  exit 1
-                fi
-                ;;
-              *)
-                echo "Problem: Unexpected distro name: $system_id"
-                cat $artifact
-                exit 1
-                ;;
-            esac
-
-            echo "* $name - Added to repository: $files" >> $GITHUB_STEP_SUMMARY
-          done
-
-      - name: Commit and push
-        run: |
+      #- name: Commit and push
+        #run: |
           # Need to set git user and email
           # Citation> https://github.com/actions/checkout?tab=readme-ov-file#push-a-commit-using-the-built-in-token
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          #git config user.name "github-actions[bot]"
+          #git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add repository
-          git commit repository -m "reprepro packages"
-          git push
+          #git add repository
+          #git commit repository -m "reprepro packages"
+          #git push
