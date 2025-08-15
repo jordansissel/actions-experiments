@@ -75,51 +75,16 @@ jobs:
         id: package
         run: |
           # Extract content from the docker image built in the previous step
-
           docker run ${{ env.TARGET_TAG }} sh -c 'cd target; tar -zc *' | tar -zvx | tee files
-
-          (
-            echo "files<<FILES"
-            cat files
-            echo "FILES"
-          ) >> $GITHUB_OUTPUT
-
-          name="${{ matrix.image }}"
-          # Can't use colons in GHA artifact names, so replace : with -
-          echo "artifact-name=${name/:/-}" >> $GITHUB_OUTPUT
-
-          osrel() {
-            field="$1"
-            line="$(grep "^${field}=" os-release)"
-
-            # Turn FOO="value" into just value
-            echo "${line#${field}=}" | sed -re 's/^"|"$//g'
-          }
-
-          docker run ${{ env.TARGET_TAG }} cat /etc/os-release > os-release
-
-          echo "system_id=$(osrel ID)" >> $GITHUB_OUTPUT
-          echo "system_version=$(osrel VERSION_ID)" >> $GITHUB_OUTPUT
-
-          # Get the codename, mostly for Debian/Ubuntu systems.
-          # This value gets used in naming the package repository later.
-          echo "system_codename=$(osrel VERSION_CODENAME)" >> $GITHUB_OUTPUT
-
-      - name: Write metadata
-        run: |
-          echo '${{ toJSON(steps.package.outputs) }}' > package.json
 
       - name: "Verify package works"
         run: |
-          echo "> Package files: ${{ steps.package.outputs.files }}"
-          cat package.json
-          echo ---
-
-          package="${{ steps.package.outputs.files }}"
-
-          docker run --workdir /tmp/workdir \
-            --volume="./:/tmp/workdir:z" \
-            ${{ matrix.image }} sh -x fpm/verify.sh "${package}"
+          package="$(find ./ -maxdepth 1 -name '*.rpm' -o -name '*.deb')"
+          docker run \
+            --volume=./fpm/verify.sh:/work/verify.sh:z \
+            --volume="$package:/work/$package:z" \
+            --workdir=/work
+            ${{ matrix.image }} sh verify.sh "${package}"
 
       - name: Upload Artifact
         id: upload
