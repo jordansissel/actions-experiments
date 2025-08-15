@@ -56,24 +56,41 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build Docker image
-        id: container
+      - name: Build apt/dnf-ready docker image
         uses: docker/build-push-action@v6
         with:
           context: fpm
-          push: false
+          outputs: type=docker # Write image to local docker cache
+          tags: ${{ env.TARGET_TAG }}-prepare
+          target: prepare # the docker stage to build
+          build-args: |
+            IMAGE=${{ matrix.image }}
+            FPM_VERSION=${{ matrix.version }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Package fpm
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: fpm
+          outputs: type=docker # Write image to local docker cache
           tags: ${{ env.TARGET_TAG }}
           build-args: |
             IMAGE=${{ matrix.image }}
             FPM_VERSION=${{ matrix.version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          # Try to push this to the local node's docker images?
-          load: true
 
       - name: Grab package file
         id: package
         run: |
+          cat <<JSON
+          ${{ toJSON(steps.build.outputs) }}
+          JSON
+
+          echo ===
+
           # Extract content from the docker image built in the previous step
           docker run ${{ env.TARGET_TAG }} sh -c 'cd target; tar -zc *' | tar -zvx | tee files
 
@@ -91,7 +108,7 @@ jobs:
             --volume=./fpm/verify.sh:/work/verify.sh:z \
             --volume="./${{ steps.package.outputs.package }}:/work/${{ steps.package.outputs.package }}:z" \
             --workdir=/work \
-            ${{ matrix.image }} sh verify.sh "${{ steps.package.outputs.package }}"
+            ${{ env.TARGET_TAG }}-prepare sh verify.sh "${{ steps.package.outputs.package }}"
 
       - name: Upload Artifact
         id: upload
