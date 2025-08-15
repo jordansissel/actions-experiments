@@ -2,11 +2,14 @@
 set -e
 
 osrel() {
-  field="$1"
-  line="$(grep "^${field}=" /etc/os-release)"
-
-  # Turn FOO="value" into just value
-  echo "${line#${field}=}" | sed -re 's/^"|"$//g'
+  # Pull the value of the FIELD=VALUE out of /etc/os-release
+  # Supported double-quoted values and removes the outer quotes
+  value="$(sed -rne "s/^${1}=\"?([^\"]+)\"?$/\1/p" /etc/os-release)"
+  if [ -z "$value" ] ; then
+    echo "Error: Could not find $1 in /etc/os-release"
+    exit 1
+  fi
+  echo "$value"
 }
 
 install_dependencies() {
@@ -90,6 +93,15 @@ run() {
       # Modify the fpm entry script to add our custom gem path
       sed -ie "1a Gem::Specification.dirs = Gem.paths.path.unshift('${installpath}')" "${basedir}/bin/fpm"
       ;;
+    buildinfo)
+      cat > "${outdir}/package.json" << METADATA
+        {
+          "distro": "$(osrel ID)",
+          "version": "$(osrel VERSION_ID)",
+          "codename": "$(osrel VERSION_CODENAME)"
+        }
+METADATA
+      ;;
     package)
       [ ! -d "$outdir" ] && mkdir "$outdir"
 
@@ -99,6 +111,7 @@ run() {
         -C "${basedir}" \
         --architecture "all" \
         --package "${outdir}" \
+        --iteration "1-$(osrel ID)$(osrel VERSION_ID)" \
         $(fpm_flags) \
         gems=${installpath} \
         specifications=${installpath} \
@@ -109,6 +122,7 @@ run() {
       run setup-fpm
       run patch
       run package
+      run buildinfo
       ;;
     *)
       echo "Unknown command: $1"
