@@ -30,16 +30,6 @@ jobs:
           # Import the gpg key and output the fingerprint that we'll need for key signing later.
           echo "$GPG_PRIVATE_KEY" | gpg --batch --import --import-options import-show --list-options show-only-fpr-mbox  > gpg.out
 
-          KEY_ID="$(cut -f 1 -d ' ' < gpg.out)"
-          echo "KEY_ID=$KEY_ID" >> $GITHUB_OUTPUT
-
-          # Ensure the gpg pubkey is available
-          #gpg --armor --export "$KEY_ID" > gpg
-          #if ! git diff --name-only --exit-code gpg  ; then
-            #echo "Updating GPG public key"
-            #git commit gpg -m "Updating public key. Key ID: ${KEY_ID}"
-          #fi
-  
       - uses: actions/checkout@v4
         with:
           ref: pages
@@ -55,20 +45,16 @@ jobs:
           path: artifacts
 
       - name: Update packate repositories
-        env:
-          KEY_ID: ${{ steps.gpg.outputs.KEY_ID }}
         run: |
-          find ./artifacts
-          echo ===
           sh code/repo/update.sh ./artifacts ./pages
 
-      #- name: Commit and push
-        #run: |
-          # Need to set git user and email
-          # Citation> https://github.com/actions/checkout?tab=readme-ov-file#push-a-commit-using-the-built-in-token
-          #git config user.name "github-actions[bot]"
-          #git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Commit and push
+        run: |
+          Need to set git user and email
+          Citation> https://github.com/actions/checkout?tab=readme-ov-file#push-a-commit-using-the-built-in-token
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          #git add repository
-          #git commit repository -m "reprepro packages"
-          #git push
+          git add repository
+          git commit repository -m "reprepro packages"
+          git push
