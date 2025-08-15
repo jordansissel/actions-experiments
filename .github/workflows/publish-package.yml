@@ -50,8 +50,8 @@ jobs:
 
       - name: Commit and push
         run: |
-          Need to set git user and email
-          Citation> https://github.com/actions/checkout?tab=readme-ov-file#push-a-commit-using-the-built-in-token
+          # Need to set git user and email
+          # Citation> https://github.com/actions/checkout?tab=readme-ov-file#push-a-commit-using-the-built-in-token
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
