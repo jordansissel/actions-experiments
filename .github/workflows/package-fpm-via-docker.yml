@@ -87,7 +87,7 @@ jobs:
           docker run \
             --volume=./fpm/verify.sh:/work/verify.sh:z \
             --volume="$package:/work/$package:z" \
-            --workdir=/work
+            --workdir=/work \
             ${{ matrix.image }} sh verify.sh "${package}"
 
       - name: Upload Artifact
