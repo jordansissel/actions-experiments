@@ -80,15 +80,16 @@ jobs:
           echo "files<<FILES" >> $GITHUB_OUTPUT
           cat files >> $GITHUB_OUTPUT
           echo "FILES" >> $GITHUB_OUTPUT
+          echo "package=$(egrep '\.(deb|rpm)$')" >> $GITHUB_OUTPUT
+          
 
       - name: "Verify package works"
         run: |
-          package="$(find ./ -maxdepth 1 -name '*.rpm' -o -name '*.deb')"
           docker run \
             --volume=./fpm/verify.sh:/work/verify.sh:z \
-            --volume="$package:/work/$package:z" \
+            --volume="./${{ steps.package.outputs.package }}:/work/${{ steps.package.outputs.package }}:z" \
             --workdir=/work \
-            ${{ matrix.image }} sh verify.sh "${package}"
+            ${{ matrix.image }} sh verify.sh "${{ steps.package.outputs.package }}"
 
       - name: Upload Artifact
         id: upload
