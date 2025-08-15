@@ -2,11 +2,14 @@
 set -e
 
 osrel() {
-  field="$1"
-  line="$(grep "^${field}=" /etc/os-release)"
-
-  # Turn FOO="value" into just value
-  echo "${line#${field}=}" | sed -re 's/^"|"$//g'
+  # Pull the value of the FIELD=VALUE out of /etc/os-release
+  # Supported double-quoted values and removes the outer quotes
+  value="$(sed -rne "s/^${1}=\"?([^\"]+)\"?$/\1/p" /etc/os-release)"
+  if [ -z "$value" ] ; then
+    echo "Error: Could not find $1 in /etc/os-release"
+    exit 1
+  fi
+  echo "$value"
 }
 
 setup() {
