@@ -123,6 +123,7 @@ jobs:
           done
 
   publish:
+    name: "🚢 Publish Packages"
     needs: [ package, "check-artifacts" ]
     uses: ./.github/workflows/publish-package.yml
     permissions:
