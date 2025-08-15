@@ -28,7 +28,7 @@ jobs:
         run: |
           echo "::add-mask::$GPG_PRIVATE_KEY"
           # Import the gpg key and output the fingerprint that we'll need for key signing later.
-          echo "$GPG_PRIVATE_KEY" | gpg --batch --import --import-options import-show --list-options show-only-fpr-mbox  > gpg.out
+          echo "$GPG_PRIVATE_KEY" | gpg --batch --import --import-options import-show --list-options show-only-fpr-mbox
 
       - uses: actions/checkout@v4
         with:
