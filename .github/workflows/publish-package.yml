@@ -47,12 +47,13 @@ jobs:
       - name: Update package repositories
         run: |
           sh code/repo/update.sh ./artifacts ./pages
+          echo "pages contains:"
+          ls -l pages
         
       - name: Generate Website
         run: |
-          ls -l ./pages
-          id
-
+          echo "pages contains:"
+          ls -l pages
           sh code/repo/website.sh ./code/html ./pages
 
       - name: Commit and push
