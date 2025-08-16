@@ -12,6 +12,11 @@ osrel() {
   echo "$value"
 }
 
+fail() {
+    echo "$@"
+    exit 1
+}
+
 flavor() {
   ID="$1"
   VERSION="$2"
@@ -28,8 +33,7 @@ setup() {
   VERSION="$(osrel VERSION_ID)"
 
   if [ ! -f "$1" ] ; then
-    echo "ERROR: Cannot install package because the file doesn't exist: $1"
-    exit 1
+    fail "Cannot install package because the file doesn't exist: $1"
   fi
 
   FLAVOR="$(flavor "$system_id" "$system_version")"
@@ -53,8 +57,7 @@ setup() {
       dnf install -y "$1"
       ;;
     * )
-      echo "Unsupported OS flavor: ${FLAVOR}"
-      exit 1
+      fail "Unsupported OS flavor: ${FLAVOR}"
       ;;
   esac
 }
