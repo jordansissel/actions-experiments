@@ -140,7 +140,8 @@ check_gpg() {
     fail "GPG is not configured correctly. Got $keycount keys, need exactly 1. Is GNUPGHOME set? Current value: $GNUPGHOME"
   fi
 
-  gpg --list-keys --list-options show-only-fpr-mbox | cut -f1 -d' ' > $workdir/gpg.pub
+  KEY_ID="$(gpg --list-keys --list-options show-only-fpr-mbox | cut -f1 -d' ')"
+  gpg --armor --export "$KEY_ID" > $workdir/repository.asc
 }
 
 process() {
