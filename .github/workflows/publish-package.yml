@@ -44,7 +44,7 @@ jobs:
         with:
           path: artifacts
 
-      - name: Update packate repositories
+      - name: Update package repositories
         run: |
           sh code/repo/update.sh ./artifacts ./pages
         
