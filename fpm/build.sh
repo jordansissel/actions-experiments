@@ -6,6 +6,24 @@ fail() {
   exit 1
 }
 
+buildinfo() {
+  ID="$(osrel ID)"
+  case "${ID}" in
+    ubuntu|debian) arch="$(dpkg --print-architecture)" ;;
+    fedora|almalinux|rocky) arch="$(rpm -q --qf "%{arch}" filesystem)" ;;
+    *) fail "Don't know how to query the architecture on system: ${ID}" ;;
+  esac
+
+  cat <<METADATA
+    {
+      "distro": "$(osrel ID)",
+      "version": "$(osrel VERSION_ID)",
+      "codename": "$(osrel VERSION_CODENAME)",
+      "architecture": "$arch"
+    }
+METADATA
+}
+
 osrel() {
   # Pull the value of the FIELD=VALUE out of /etc/os-release
   # Supported double-quoted values and removes the outer quotes
@@ -105,13 +123,7 @@ USAGE
       sed -ie "1a Gem::Specification.dirs = Gem.paths.path.unshift('${installpath}')" "${basedir}/bin/fpm"
       ;;
     buildinfo)
-      cat > "${outdir}/package.json" << METADATA
-        {
-          "distro": "$(osrel ID)",
-          "version": "$(osrel VERSION_ID)",
-          "codename": "$(osrel VERSION_CODENAME)"
-        }
-METADATA
+      buildinfo > "${outdir}/package.json"
       ;;
     package)
       [ ! -d "$outdir" ] && mkdir "$outdir"
