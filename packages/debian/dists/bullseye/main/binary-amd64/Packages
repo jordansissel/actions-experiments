@@ -1,0 +1,18 @@
+Package: fpm
+Version: 1.16.0-1-debian11
+License: unknown
+Vendor: none
+Architecture: all
+Maintainer: <@buildkitsandbox>
+Installed-Size: 2211
+Depends: rpm, binutils, ruby
+Homepage: http://example.com/no-uri-given
+Priority: optional
+Section: default
+Filename: pool/main/f/fpm/fpm_1.16.0-1-debian11_all.deb
+Size: 590582
+SHA256: 32559fc7ec9c97758d1878be6620bc7bfa340bffc57ec9c1cbbdeba7323f1b16
+SHA1: 2709524e661a9c4c89f99036cfd912f040e68793
+MD5sum: 1c17b18d1314a0798c7f0cf6e9051ae3
+Description: no description given
+

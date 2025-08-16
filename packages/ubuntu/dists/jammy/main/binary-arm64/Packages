@@ -1,0 +1,18 @@
+Package: fpm
+Version: 1.16.0-1-ubuntu22.04
+License: unknown
+Vendor: none
+Architecture: all
+Maintainer: <@buildkitsandbox>
+Installed-Size: 2225
+Depends: rpm, binutils, ruby
+Homepage: http://example.com/no-uri-given
+Priority: optional
+Section: default
+Filename: pool/main/f/fpm/fpm_1.16.0-1-ubuntu22.04_all.deb
+Size: 595756
+SHA256: 9c185aa41836153b8d93b288993f6e3504c35f3f4958b1c7902054db576be491
+SHA1: 4fe156f4194a3918e308f4e5c083876cb4f382cf
+MD5sum: 09bdedff21b3d41474b45b9ec503664d
+Description: no description given
+

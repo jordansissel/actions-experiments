@@ -1,0 +1,48 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+Origin: the fpm project
+Label: fpm
+Suite: stable
+Codename: bookworm
+Date: Sat, 16 Aug 2025 17:10:39 UTC
+Architectures: amd64 arm64 i386
+Components: main
+Description: fpm
+MD5Sum:
+ 10d25853eb5b56d64256813a3c834050 512 main/binary-amd64/Packages
+ b1e0e0d278234a72eb23cfddaf7e8d3c 385 main/binary-amd64/Packages.gz
+ f7f6b62d968b82ed3a7d6d73b848f5fe 104 main/binary-amd64/Release
+ 10d25853eb5b56d64256813a3c834050 512 main/binary-arm64/Packages
+ b1e0e0d278234a72eb23cfddaf7e8d3c 385 main/binary-arm64/Packages.gz
+ 434d4011b0e4ce6e7239952bd2ac8088 104 main/binary-arm64/Release
+ 10d25853eb5b56d64256813a3c834050 512 main/binary-i386/Packages
+ b1e0e0d278234a72eb23cfddaf7e8d3c 385 main/binary-i386/Packages.gz
+ f5cd048e656ac55efd379e46b8d2ddde 103 main/binary-i386/Release
+SHA1:
+ 26844fb30be5a2ee248918a082199b54fcbaad27 512 main/binary-amd64/Packages
+ 7925dc99364a2a312e5183d5a669de6f46707d71 385 main/binary-amd64/Packages.gz
+ b7bf1008d023e5ae81c3e0f0d12ae5f46c39a406 104 main/binary-amd64/Release
+ 26844fb30be5a2ee248918a082199b54fcbaad27 512 main/binary-arm64/Packages
+ 7925dc99364a2a312e5183d5a669de6f46707d71 385 main/binary-arm64/Packages.gz
+ 78b9239dad9d31b3cd68ec696589ceeacaaacac9 104 main/binary-arm64/Release
+ 26844fb30be5a2ee248918a082199b54fcbaad27 512 main/binary-i386/Packages
+ 7925dc99364a2a312e5183d5a669de6f46707d71 385 main/binary-i386/Packages.gz
+ 20fa98dc6d1a103f4e13f3d592cb900c372036dd 103 main/binary-i386/Release
+SHA256:
+ 9698ab147d234288a1657678060369a68e8cea82423a2785f722764b9ebe7e39 512 main/binary-amd64/Packages
+ 435a95a4729b1a7e45fa5d33587d681b9eb0f0e18b237e7f28e524824d440951 385 main/binary-amd64/Packages.gz
+ da10a7e9e8a568ca8e58fcdd5a0d4d6391ec4dbb3690bbc511f3972ad2d60a01 104 main/binary-amd64/Release
+ 9698ab147d234288a1657678060369a68e8cea82423a2785f722764b9ebe7e39 512 main/binary-arm64/Packages
+ 435a95a4729b1a7e45fa5d33587d681b9eb0f0e18b237e7f28e524824d440951 385 main/binary-arm64/Packages.gz
+ 018040f10fe6f896937b283eb59f2fbbc06e301e54b4bc77478d4ce7774a55ee 104 main/binary-arm64/Release
+ 9698ab147d234288a1657678060369a68e8cea82423a2785f722764b9ebe7e39 512 main/binary-i386/Packages
+ 435a95a4729b1a7e45fa5d33587d681b9eb0f0e18b237e7f28e524824d440951 385 main/binary-i386/Packages.gz
+ 509307f4da731d40bc5681d3e0a76ec072960c5a0a2e269cbb4836d0715f6091 103 main/binary-i386/Release
+-----BEGIN PGP SIGNATURE-----
+
+iHUEARYKAB0WIQRapn5Am9R1y6dYYga8ggTXFc7IWAUCaKC7jwAKCRC8ggTXFc7I
+WGooAQC6Puu1upfNZH7iu+C8GT00/z82AEdEyTEnxvtNOg/nYAD/dE+8XlyokY3p
+KrqrdSU5g22b7JLCtW6PWO3rpRbw6QE=
+=6Ckj
+-----END PGP SIGNATURE-----
