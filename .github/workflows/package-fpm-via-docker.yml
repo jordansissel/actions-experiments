@@ -100,9 +100,13 @@ jobs:
           #docker run ${{ env.TARGET_TAG }} sh -c 'cd target; tar -zc *' | tar -zvx | tee files
 
           # Some images don't have 'tar' by default, so let's copy files across bind mounts.
-          docker run --user="$(id -u):$(id -g)" \
-            --volume "./:/out:z" "$2" \
-            sh -c "cp /tmp/target/* /out; (cd /tmp/target; find .)" - | tee files
+          docker run \
+            --user="$(id -u):$(id -g)" \
+            --volume="./:/out:z" \
+            "${{ env.TARGET_TAG }}" \
+            sh -c "cp /tmp/target/* /out; (cd /tmp/target; find .)" \
+          | tee files
+          docker run ${{ env.TARGET_TAG }} sh -c 'cd target; tar -zc *' | tar -zvx | tee files
 
           echo "files<<FILES" >> $GITHUB_OUTPUT
           cat files >> $GITHUB_OUTPUT
