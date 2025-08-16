@@ -86,12 +86,12 @@ PREFS
 
 <h2 id="full-installation-recipe">Full Installation Recipe</h2>
 
-<p>Install the <code class="language-plaintext highlighter-rouge">dnf config-manager</code> plugin:</p>
+<p>If you are running dnf v4, you will need to install the dnf config-manager plugin. You can check the version by checking the first line output from <code class="language-plaintext highlighter-rouge">dnf --version</code>. Users of dnf v5 can skip this step.</p>
 
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo dnf install -y dnf-plugins-core
 </code></pre></div></div>
 
-<p>Add the fpm package repository:</p>
+<p>Now, use <code class="language-plaintext highlighter-rouge">dnf config-manager</code> to add the fpm repository:</p>
 
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>distro="$(sed -rne 's/^ID="?([^"]+)"?/\1/p' /etc/os-release)"
 sudo dnf config-manager addrepo --from-repofile=https://jordansissel.github.io/actions-experiments/config/${distro}/fpm.repo
