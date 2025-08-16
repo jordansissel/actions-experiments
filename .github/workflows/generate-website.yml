@@ -1,6 +1,6 @@
 name: Generate Website (jekyll parts)
 on:
-  workflow_call:
+  workflow_dispatch:
 
 env:
   registry: ghcr.io
