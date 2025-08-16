@@ -50,6 +50,8 @@ jobs:
           sh code/repo/update.sh ./artifacts ./pages/packages
         
       - name: Generate Website
+        env:
+          DOCKER_CACHE: "gha"
         run: |
           sh code/repo/website.sh ./code/html ./pages
 

@@ -1,0 +1,52 @@
+name: Generate Website (jekyll parts)
+on:
+  workflow_call:
+
+env:
+  registry: ghcr.io
+
+jobs:
+  publish:
+    permissions:
+      # Allow this job to write to the pages branch
+      contents: write
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: pages
+          path: pages
+
+      - uses: actions/checkout@v4
+        with:
+          path: code
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: ${{ env.registry }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+          #cache-from: type=gha
+          #cache-to: type=gha,mode=max
+
+      - name: Generate Website
+        env:
+          DOCKER_CACHE: "gha"
+        run: sh code/repo/website.sh ./code/html ./pages
+
+      - name: Commit and push
+        working-directory: pages
+        run: |
+          # Need to set git user and email
+          # Citation> https://github.com/actions/checkout?tab=readme-ov-file#push-a-commit-using-the-built-in-token
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add .
+          git status
+          git commit -m "run jekyll"
+          git push

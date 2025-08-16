@@ -50,8 +50,8 @@ You may download the dnf/yum repo configuration or use the installation recipe b
 
 ## Yum/DNF Repo files
 
-* [Fedora](fedora.repo)
-* [Rocky](rocky.repo)
+* [Fedora](config/fedora/fpm.repo)
+* [Rocky](config/rocky/fpm.repo)
 
 ## Full Installation Recipe
 
@@ -61,11 +61,11 @@ Install the `dnf config-manager` plugin:
 sudo dnf install -y dnf-plugins-core
 ```
 
-Add the package repository:
+Add the fpm package repository:
 
 ```
 distro="$(sed -rne 's/^ID="?([^"]+)"?/\1/p' /etc/os-release)"
-sudo dnf config-manager addrepo --from-repofile=https://jordansissel.github.io/actions-experiments/${distro}.repo
+sudo dnf config-manager addrepo --from-repofile=https://jordansissel.github.io/actions-experiments/config/${distro}/fpm.repo
 ```
 
 Install fpm:
