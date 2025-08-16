@@ -25,7 +25,7 @@ curl -Ls https://jordansissel.github.io/actions-experiments/gpg.pub | gpg --dear
 ```
 sudo tee /etc/apt/sources.list.d/fpm.sources <<SOURCES > /dev/null
 Types: deb
-URIs: https://jordansissel.github.io/actions-experiments/$(sed -rne 's/^ID="?([^"]+)"?$/\1/p' /etc/os-release)
+URIs: https://jordansissel.github.io/actions-experiments/packages/$(sed -rne 's/^ID="?([^"]+)"?$/\1/p' /etc/os-release)
 Suites: $(sed -rne 's/^VERSION_CODENAME="?([^"]+)"?$/\1/p' /etc/os-release)
 Components: main
 Signed-By: /usr/share/keyrings/fpm-archive-keyring.pgp

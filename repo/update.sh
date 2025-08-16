@@ -139,6 +139,8 @@ check_gpg() {
   if [ "$keycount" -ne 1 ] ; then
     fail "GPG is not configured correctly. Got $keycount keys, need exactly 1. Is GNUPGHOME set? Current value: $GNUPGHOME"
   fi
+
+  gpg --list-keys --list-options show-only-fpr-mbox | cut -f1 -d' ' > $workdir/gpg.pub
 }
 
 process() {
@@ -171,5 +173,3 @@ check_gpg
 for metadata in "$inbox"/*/package.json ; do
   process "$metadata"
 done
-
-gpg --list-keys --list-options show-only-fpr-mbox | cut -f1 -d' ' > $workdir/gpg.pub
