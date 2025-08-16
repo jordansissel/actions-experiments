@@ -96,12 +96,6 @@ jobs:
       - name: Grab package file
         id: package
         run: |
-          cat <<JSON
-          ${{ toJSON(steps.build.outputs) }}
-          JSON
-
-          echo ===
-
           # Extract content from the docker image built in the previous step
           docker run ${{ env.TARGET_TAG }} sh -c 'cd target; tar -zc *' | tar -zvx | tee files
 
