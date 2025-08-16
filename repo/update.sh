@@ -171,3 +171,5 @@ process() {
 for metadata in "$inbox"/*/package.json ; do
   process "$metadata"
 done
+
+gpg --list-keys --list-options show-only-fpr-mbox | cut -f1 -d' ' > $workdir/gpg.pub
