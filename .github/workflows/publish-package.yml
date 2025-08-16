@@ -50,6 +50,9 @@ jobs:
         
       - name: Generate Website
         run: |
+          ls -l ./pages
+          id
+
           sh code/repo/website.sh ./pages
 
       - name: Commit and push
