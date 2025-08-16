@@ -16,4 +16,4 @@ html="$(dirname "$base")"/html
 set -x
 pwd
 ls -d $workdir
-docker run --volume "$PWD:/srv/jekyll:z" --volume "$workdir:/workdir:z" jekyll/minimal jekyll build -d /workdir --disable-disk-cache
+docker run --volume "$PWD:/srv/jekyll:z" --volume "$workdir:/workdir:z" jekyll/minimal sh -c "ls -ld /workdir; id; usermod -u $(id -u) jekyll; id; jekyll build -d /workdir --disable-disk-cache
