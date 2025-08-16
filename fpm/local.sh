@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# rm -fr /tmp/gpgtest; mkdir /tmp/gpgtest; sh gpg/generate-key.sh foo@example.com | gpg --homedir /tmp/gpgtest --import --batch
+# docker build repo -t repotest 
+# docker run -it --volume ./:/code:z --volume /tmp/gpgtest:/root/.gnupg:z --volume /tmp/repository:/repository:z --volume /tmp/z/artifacts:/inbox:z repotest sh -c 'cd /code; sh repo/update.sh /inbox /repository'
+
 set -e
 
 echo "Dirname: $(dirname "$0")"
