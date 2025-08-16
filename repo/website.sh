@@ -7,6 +7,8 @@ fail() {
 
 set -e 
 
+set -x 
+
 source="$1"
 destination="$2"
 [ -z "$source" ] && fail "Missing argument for source directory"
