@@ -80,8 +80,8 @@ PREFS
 <h2 id="yumdnf-repo-files">Yum/DNF Repo files</h2>
 
 <ul>
-  <li><a href="fedora.repo">Fedora</a></li>
-  <li><a href="rocky.repo">Rocky</a></li>
+  <li><a href="config/fedora/fpm.repo">Fedora</a></li>
+  <li><a href="config/rocky/fpm.repo">Rocky</a></li>
 </ul>
 
 <h2 id="full-installation-recipe">Full Installation Recipe</h2>
@@ -91,10 +91,10 @@ PREFS
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo dnf install -y dnf-plugins-core
 </code></pre></div></div>
 
-<p>Add the package repository:</p>
+<p>Add the fpm package repository:</p>
 
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>distro="$(sed -rne 's/^ID="?([^"]+)"?/\1/p' /etc/os-release)"
-sudo dnf config-manager addrepo --from-repofile=https://jordansissel.github.io/actions-experiments/${distro}.repo
+sudo dnf config-manager addrepo --from-repofile=https://jordansissel.github.io/actions-experiments/config/${distro}/fpm.repo
 </code></pre></div></div>
 
 <p>Install fpm:</p>
