@@ -1,6 +1,0 @@
-[fpm]
-name=fpm - $basearch
-baseurl=https://jordansissel.github.io/actions-experiments/%DISTRO%/$releasever/stable/$basearch
-enabled=1
-gpgcheck=1
-gpgkey=https://jordansissel.github.io/actions-experiments/gpg.pub

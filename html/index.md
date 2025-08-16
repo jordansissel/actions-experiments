@@ -12,12 +12,12 @@ Table of Contents:
 
 ## Install the repository public key
 
-You will need to download the [public GPG key](gpg.pub) and store it on your system as `/usr/share/keyrings/fpm-archive-keyring.pgp`.
+You will need to download the [public GPG key](packages/repository.asc) and store it on your system as `/usr/share/keyrings/fpm-archive-keyring.pgp`.
 
 To achieve this, the following script can be copied into a terminal. The script requires `curl`, `gpg`, and `sudo` to be available.
 
 ```
-curl -Ls https://jordansissel.github.io/actions-experiments/gpg.pub | gpg --dearmor | sudo tee /usr/share/keyrings/fpm-archive-keyring.pgp > /dev/null
+curl -Ls https://jordansissel.github.io/actions-experiments/packages/repository.asc | gpg --dearmor | sudo tee /usr/share/keyrings/fpm-archive-keyring.pgp > /dev/null
 ```
 
 ## Add the repository to apt
@@ -46,6 +46,15 @@ PREFS
 
 # Fedora and Rocky Linux
 
+You may download the dnf/yum repo configuration or use the installation recipe below:
+
+## Yum/DNF Repo files
+
+* [Fedora](fedora.repo)
+* [Rocky](rocky.repo)
+
+## Full Installation Recipe
+
 Install the `dnf config-manager` plugin:
 
 ```
@@ -55,7 +64,8 @@ sudo dnf install -y dnf-plugins-core
 Add the package repository:
 
 ```
-sudo dnf config-manager addrepo --from-repofile=https://jordansissel.github.io/actions-experiments/fedora/fpm.repo
+distro="$(sed -rne 's/^ID="?([^"]+)"?/\1/p' /etc/os-release)"
+sudo dnf config-manager addrepo --from-repofile=https://jordansissel.github.io/actions-experiments/${distro}.repo
 ```
 
 Install fpm:
