@@ -14,4 +14,4 @@ base="$(dirname "$0")"
 html="$(dirname "$0")"/../html
 
 cd "$html"
-docker run --volume "$PWD:/srv/jekyll:z" --volume "$workdir:$workdir:z" jekyll/minimal jekyll build -d "$workdir"
+docker run --volume "$PWD:/srv/jekyll:z" --volume "$workdir:/workdir:z" jekyll/minimal jekyll build -d "/workdir"
