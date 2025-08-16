@@ -20,13 +20,16 @@ mkdir "$ARTIFACTSDIR"
 
 build_images() {
   # Build all the linux packages
-  docker buildx bake --metadata-file "$WORKDIR/metadata.json"
+  docker buildx bake --metadata-file "$WORKDIR/metadata.json" default repotool
 }
 
 extract_packages() {
-  #jq < "$WORKDIR/metadata.json" -r 'to_entries[] | "\(.key) \(.value["containerimage.digest"])"' \
+  echo "Extracting Artifacts"
+  echo "Dir: $ARTIFACTSDIR"
+  ls -ld $ARTIFACTSDIR
+
   jq < "$WORKDIR/metadata.json" -r 'to_entries[] | select(.value["containerimage.digest"] != null) | "\(.key) \(.value["containerimage.digest"])"' \
-  | ARTIFACTSDIR="$ARTIFACTSDIR" xargs -P4 -n2 sh -c 'mkdir "$ARTIFACTSDIR/$1" && docker run "$2" sh -c "cd target; tar -zc *" | tar -zx -C "$ARTIFACTSDIR/$1"' -
+  | ARTIFACTSDIR="$ARTIFACTSDIR" xargs -P1 -n2 sh -c 'mkdir "$ARTIFACTSDIR/$1"; ls -ld "$ARTIFACTSDIR/$1"; docker run --user="$(id -u):$(id -g)" --volume "$ARTIFACTSDIR/$1:/out:z" "$2" sh -c "cp /tmp/target/* /out"' -
 }
 
 cleanup() {
@@ -37,12 +40,27 @@ cleanup() {
 }
 
 build_repo() {
-  [ ! -d "$WORKDIR/repo" ] && mkdir "$WORKDIR/repo"
-  sh ../repo/update.sh "$ARTIFACTSDIR" "$WORKDIR/repo"
+  [ ! -d "$WORKDIR/web" ] && mkdir "$WORKDIR/web"
+  [ ! -d "$WORKDIR/web/packages" ] && mkdir "$WORKDIR/web/packages"
+  [ ! -d "$WORKDIR/gpg" ] && mkdir "$WORKDIR/gpg"
+
+  # Generate a throw-away key for signing packages.
+  sh ../gpg/generate-key.sh foo@example.com | gpg --homedir "$WORKDIR/gpg" --import 
+
+  docker run --volume "$ARTIFACTSDIR:/artifacts:z" --volume "$WORKDIR/gpg:/root/.gnupg:z" --volume "$WORKDIR/web:/web:z" fpm-repotool:latest sh -c 'sh /tmp/update.sh /artifacts /web/packages'
+}
+
+build_web() {
+  [ ! -d "$WORKDIR/web" ] && mkdir "$WORKDIR/web"
+  sh ../repo/website.sh ../html "$WORKDIR/web"
 }
 
 build_images
+
 extract_packages
+
 build_repo
+
+build_web
 
 #cleanup
