@@ -56,7 +56,7 @@ jobs:
           ls -l pages
           sh code/repo/website.sh ./code/html ./pages
           echo "pages contains:"
-          ls -l .
+          ls -l pages
 
       - name: Commit and push
         working-directory: pages
