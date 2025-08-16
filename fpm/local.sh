@@ -17,7 +17,8 @@ build_images() {
 }
 
 extract_packages() {
-  jq < "$WORKDIR/metadata.json" -r 'to_entries[] | "\(.key) \(.value["containerimage.digest"])"' \
+  #jq < "$WORKDIR/metadata.json" -r 'to_entries[] | "\(.key) \(.value["containerimage.digest"])"' \
+  jq < "$WORKDIR/metadata.json" -r 'to_entries[] | select(.value["containerimage.digest"] != null) | "\(.key) \(.value["containerimage.digest"])"' \
   | xargs -P4 -n2 sh -c 'mkdir "$WORKDIR/$1" && docker run "$2" sh -c "cd target; tar -zc *" | tar -zx -C "$WORKDIR/$1"' -
 }
 
