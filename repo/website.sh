@@ -15,10 +15,5 @@ destination="$2"
 [ ! -d "$source" ] && fail "Source directory must exist: $source"
 [ ! -d "$destination" ] && fail "Destination directory must exist: $destination"
 
-# Use GHA cache if we're on Github Actions
-if [ "$DOCKER_CACHE" = "gha" ] ; then
-  DOCKER_FLAGS="--cache-from  type=gha --cache-to type=gha,mode=max"
-fi
-
-docker run $DOCKER_FLAGS --volume "$source:/source:z" --volume "$destination:/destination:z" jekyll/minimal \
+docker run --volume "$source:/source:z" --volume "$destination:/destination:z" jekyll/minimal \
   sh -xc "usermod -u $(id -u) jekyll; find /source; jekyll build -s /source -d /destination --disable-disk-cache"
