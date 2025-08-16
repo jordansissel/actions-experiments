@@ -99,13 +99,11 @@ jobs:
           set -e
 
           # Extract content from the docker image built in the previous step
-          #docker run ${{ env.TARGET_TAG }} sh -c 'cd target; tar -zc *' | tar -zvx | tee files
-
           # Some images don't have 'tar' by default, so let's copy files across bind mounts.
           docker run \
             --user="$(id -u):$(id -g)" \
             --volume="./:/out:z" \
-            --workdir=/tmp/target
+            --workdir=/tmp/target \
             "${{ env.TARGET_TAG }}" \
             sh -c "cp * /out; ls -1d *" \
           | tee files
