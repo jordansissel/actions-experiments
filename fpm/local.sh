@@ -28,8 +28,8 @@ extract_packages() {
   echo "Dir: $ARTIFACTSDIR"
   ls -ld $ARTIFACTSDIR
 
-  jq < "$WORKDIR/metadata.json" -r 'to_entries[] | select(.value["containerimage.digest"] != null) | "\(.key) \(.value["containerimage.digest"])"' \
-  | ARTIFACTSDIR="$ARTIFACTSDIR" xargs -P1 -n2 sh -c 'mkdir "$ARTIFACTSDIR/$1"; ls -ld "$ARTIFACTSDIR/$1"; docker run --user="$(id -u):$(id -g)" --volume "$ARTIFACTSDIR/$1:/out:z" "$2" sh -c "cp /tmp/target/* /out"' -
+  jq < "$WORKDIR/metadata.json" -r 'to_entries[] | select(.value["containerimage.digest"] != null and .key != "repotool") | "\(.key) \(.value["containerimage.digest"])"' \
+  | ARTIFACTSDIR="$ARTIFACTSDIR" xargs -P4 -n2 sh -c 'mkdir "$ARTIFACTSDIR/$1"; ls -ld "$ARTIFACTSDIR/$1"; docker run --user="$(id -u):$(id -g)" --volume "$ARTIFACTSDIR/$1:/out:z" "$2" sh -c "cp /tmp/target/* /out"' -
 }
 
 cleanup() {
