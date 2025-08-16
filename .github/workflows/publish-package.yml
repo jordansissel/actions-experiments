@@ -55,15 +55,20 @@ jobs:
           echo "pages contains:"
           ls -l pages
           sh code/repo/website.sh ./code/html ./pages
+          echo "pages contains:"
+          ls -l .
 
       - name: Commit and push
         working-directory: pages
         run: |
+          echo "pages contains:"
+          ls -l .
           # Need to set git user and email
           # Citation> https://github.com/actions/checkout?tab=readme-ov-file#push-a-commit-using-the-built-in-token
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git add .
+          git status
           git commit -m "reprepro packages"
           git push
