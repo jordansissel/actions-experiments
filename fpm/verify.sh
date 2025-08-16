@@ -12,6 +12,17 @@ osrel() {
   echo "$value"
 }
 
+flavor() {
+  ID="$1"
+  VERSION="$2"
+
+  case "${ID}" in
+    ubuntu|debian) echo "deb" ;;
+    fedora|almalinux|rocky|amzn|almalinux|centos) echo "rpm" ;;
+    *) fail "Unsupported/unexpected distro: ${ID}" ;;
+  esac
+}
+
 setup() {
   ID="$(osrel ID)"
   VERSION="$(osrel VERSION_ID)"
@@ -21,9 +32,11 @@ setup() {
     exit 1
   fi
 
+  FLAVOR="$(flavor "$system_id" "$system_version")"
+
   echo "[Detected OS: $ID $VERSION]"
-  case "${ID}" in
-    ubuntu|debian) 
+  case "${FLAVOR}" in
+    deb) 
       apt-get update
 
       # apt-get install can install local files, but they have to appear to be a path.
@@ -36,11 +49,11 @@ setup() {
 
       apt-get install -y "$file"
       ;;
-    almalinux|rocky|fedora)
+    rpm)
       dnf install -y "$1"
       ;;
     * )
-      echo "Unsupported OS: ${ID}"
+      echo "Unsupported OS flavor: ${FLAVOR}"
       exit 1
       ;;
   esac
