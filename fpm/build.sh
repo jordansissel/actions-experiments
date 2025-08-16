@@ -6,21 +6,31 @@ fail() {
   exit 1
 }
 
-buildinfo() {
+flavor() {
   ID="$(osrel ID)"
+  #VERSION="$(osrel VERSION_ID)"
+
   case "${ID}" in
-    ubuntu|debian) arch="$(dpkg --print-architecture)" ;;
-    fedora|almalinux|rocky) arch="$(rpm -q --qf "%{arch}" filesystem)" ;;
+    ubuntu|debian) FLAVOR="deb" ;;
+    fedora|almalinux|rocky|amzn|almalinux) FLAVOR="rpm" ;;
+    *) fail "Unsupported/unexpected distro: ${ID}" ;;
+  esac
+}
+
+buildinfo() {
+  case "${FLAVOR}" in
+    deb) arch="$(dpkg --print-architecture)" ;;
+    rpm) arch="$(rpm -q --qf "%{arch}" filesystem)" ;;
     *) fail "Don't know how to query the architecture on system: ${ID}" ;;
   esac
 
   cat <<METADATA
-    {
-      "distro": "$(osrel ID)",
-      "version": "$(osrel VERSION_ID)",
-      "codename": "$(osrel VERSION_CODENAME)",
-      "architecture": "$arch"
-    }
+{
+  "distro": "$(osrel ID)",
+  "version": "$(osrel VERSION_ID)",
+  "codename": "$(osrel VERSION_CODENAME)",
+  "architecture": "$arch"
+}
 METADATA
 }
 
@@ -35,12 +45,9 @@ osrel() {
 }
 
 refresh_packages() {
-  ID="$(osrel ID)"
-  VERSION="$(osrel VERSION_ID)"
-
-  case "${ID}" in
-    ubuntu|debian) apt-get update --quiet ;;
-    fedora|almalinux|rocky) dnf makecache ;;
+  case "${FLAVOR}" in
+    deb) apt-get update --quiet ;;
+    rpm) dnf makecache ;;
     *)
       fail "Unsupported OS: ${ID}"
       ;;
@@ -51,14 +58,15 @@ install_dependencies() {
   ID="$(osrel ID)"
   VERSION="$(osrel VERSION_ID)"
 
-  echo "[Detected OS: $ID $VERSION]"
-  case "${ID}" in
-    ubuntu|debian) 
-      apt-get install -y --quiet ruby binutils
-      ;;
-    fedora|almalinux|rocky)
-      dnf install -y ruby-devel rpm-build
-      ;;
+  echo "[Detected OS: $ID $VERSION] (Flavor: $FLAVOR)"
+
+  # Note: Amazon Linux doesn't come with tar, so let's make sure to install it.
+  # Other distros have tar out of the box, but it won't hurt to ensure it everywhere.
+  #
+
+  case "${FLAVOR}" in
+    deb) apt-get install -y --quiet ruby binutils tar ;;
+    rpm) dnf install -y ruby-devel rpm-build tar ;;
     *) fail "Unsupported OS: ${ID}" ;;
   esac
 }
@@ -67,20 +75,22 @@ fpm_flags() {
   ID="$(osrel ID)"
   VERSION="$(osrel VERSION_ID)"
 
-  case "${ID}" in
-    ubuntu|debian) 
+  case "${FLAVOR}" in
+    deb) 
       echo "-t deb"
       echo "--depends rpm"
       echo "--depends binutils"
       echo "--depends ruby"
+      echo "--depends tar"
       ;;
-    fedora|almalinux|rocky)
+    rpm)
       echo "-t rpm"
       echo "--depends rpm-build"
       echo "--depends binutils"
       echo "--depends ruby"
+      echo "--depends tar"
       ;;
-    * )
+    *)
       fail "Unsupported OS: ${ID}"
       ;;
   esac
@@ -107,6 +117,8 @@ USAGE
   basedir="/tmp/build"
   installpath="/usr/lib/fpm"
   outdir="target"
+
+  flavor
 
   case "$1" in
     refresh-packages)
