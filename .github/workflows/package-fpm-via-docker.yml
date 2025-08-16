@@ -1,4 +1,5 @@
 name: 📦 FPM - Multiple Platforms
+run-name: 📦 FPM - Multiple Platforms (v${{ inputs.version }})
 
 on:
   workflow_dispatch:
