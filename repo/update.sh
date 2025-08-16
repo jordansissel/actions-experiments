@@ -141,6 +141,18 @@ check_gpg() {
   fi
 }
 
+process() {
+  metadata="$1"
+  [ -z "$metadata" ] && fail "process() called with no arguments"
+
+  echo ">> $metadata"
+  files="$(jq -r '.files' < $metadata)"
+  system_id="$(jq -r '.system_id' < $metadata)"
+  system_version="$(jq -r '.system_version' < $metadata)"
+  system_codename="$(jq -r '.system_codename' < $metadata)"
+  add "$(dirname "$metadata")" "$workdir"
+}
+
 #echo "# Package Repository Updates" >> $GITHUB_STEP_SUMMARY
 
 inbox="$1"
@@ -155,18 +167,6 @@ if [ "$#" -ne 2 ] ; then
 fi
 
 check_gpg
-
-process() {
-  metadata="$1"
-  [ -z "$metadata" ] && fail "process() called with no arguments"
-
-  echo ">> $metadata"
-  files="$(jq -r '.files' < $metadata)"
-  system_id="$(jq -r '.system_id' < $metadata)"
-  system_version="$(jq -r '.system_version' < $metadata)"
-  system_codename="$(jq -r '.system_codename' < $metadata)"
-  add "$(dirname "$metadata")" "$workdir"
-}
 
 for metadata in "$inbox"/*/package.json ; do
   process "$metadata"
