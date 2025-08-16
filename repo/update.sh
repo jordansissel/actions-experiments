@@ -8,6 +8,17 @@ fail() {
   exit 1
 }
 
+flavor() {
+  ID="$1"
+  VERSION="$2"
+
+  case "${ID}" in
+    ubuntu|debian) echo "deb" ;;
+    fedora|almalinux|rocky|amzn|almalinux) echo "rpm" ;;
+    *) fail "Unsupported/unexpected distro: ${ID}" ;;
+  esac
+}
+
 add() {
   inbox="$1"
   workdir="$2"
@@ -32,9 +43,10 @@ add() {
   echo "[ $system_id $system_version ] Processing package: ${source}"
 
   KEY_ID="$(gpg --list-keys --list-options show-only-fpr-mbox | cut -f1 -d' ')"
+  FLAVOR="$(flavor "$system_id" "$system_version")"
 
-  case "$system_id" in
-    debian|ubuntu)
+  case "$FLAVOR" in
+    deb)
       repo="$workdir/$system_id"
       prepare_repo "$metadata" "$repo"
 
@@ -53,7 +65,7 @@ add() {
         fail "reprepro failed on $repo"
       fi
       ;;
-    rocky|almalinux|fedora)
+    rpm)
       repo="$workdir/$system_id/$system_version/stable/$architecture"
       [ ! -d "$repo" ] && mkdir -p "$repo"
 
@@ -110,8 +122,10 @@ prepare_repo() {
   system_version="$(jq -r '.version' < $metadata)"
   system_codename="$(jq -r '.codename' < $metadata)"
 
-  case "$system_id" in
-    debian|ubuntu)
+  FLAVOR="$(flavor "$system_id" "$system_version")"
+
+  case "$FLAVOR" in
+    deb)
       if ! grep -qxF "Codename: $system_codename" "$repo/conf/distributions" ; then
         [ ! -d "$repo/conf" ] && mkdir -p "$repo/conf"
         echo "=> Adding new codename to $system_id repo: $system_codename"
