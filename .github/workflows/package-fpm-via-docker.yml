@@ -20,7 +20,17 @@ jobs:
       matrix:
         version: 
           - ${{ inputs.version }}
-        image: [ "rockylinux:9", "fedora:42", "ubuntu:24.04", "ubuntu:22.04", "debian:11", "debian:12" ]
+        image:
+          - "debian:11"
+          - "debian:12"
+          - "fedora:42
+          - "rockylinux/rockylinux:9"
+          - "rockylinux/rockylinux:10"
+          - "ubuntu:22.04"
+          - "ubuntu:24.04"
+          - "almalinux:9"
+          - "almalinux:10"
+          - "amazonlinux:2023"
 
     env:
       # docker/build-push-action is documented to output an 'imageid', but in
