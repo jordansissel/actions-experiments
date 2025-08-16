@@ -47,7 +47,12 @@ build_repo() {
   # Generate a throw-away key for signing packages.
   sh ../gpg/generate-key.sh foo@example.com | gpg --homedir "$WORKDIR/gpg" --import 
 
-  docker run --volume "$ARTIFACTSDIR:/artifacts:z" --volume "$WORKDIR/gpg:/root/.gnupg:z" --volume "$WORKDIR/web:/web:z" fpm-repotool:latest sh -c 'sh /tmp/update.sh /artifacts /web/packages'
+  docker run \
+    --user "$(id -u):$(id -g)" \
+    --volume "$ARTIFACTSDIR:/artifacts:z" \
+    --volume "$WORKDIR/gpg:/gpg:z" \
+    --env GNUPGHOME=/gpg \
+    --volume "$WORKDIR/web:/web:z" fpm-repotool:latest sh -c 'sh /tmp/update.sh /artifacts /web/packages'
 }
 
 build_web() {
