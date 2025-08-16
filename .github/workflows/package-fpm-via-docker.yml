@@ -96,6 +96,8 @@ jobs:
       - name: Grab package file
         id: package
         run: |
+          set -e
+
           # Extract content from the docker image built in the previous step
           #docker run ${{ env.TARGET_TAG }} sh -c 'cd target; tar -zc *' | tar -zvx | tee files
 
@@ -103,10 +105,10 @@ jobs:
           docker run \
             --user="$(id -u):$(id -g)" \
             --volume="./:/out:z" \
+            --workdir=/tmp/target
             "${{ env.TARGET_TAG }}" \
-            sh -c "cp /tmp/target/* /out; (cd /tmp/target; find .)" \
+            sh -c "cp * /out; ls -1d *" \
           | tee files
-          docker run ${{ env.TARGET_TAG }} sh -c 'cd target; tar -zc *' | tar -zvx | tee files
 
           echo "files<<FILES" >> $GITHUB_OUTPUT
           cat files >> $GITHUB_OUTPUT
