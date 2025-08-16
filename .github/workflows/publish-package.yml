@@ -47,6 +47,10 @@ jobs:
       - name: Update packate repositories
         run: |
           sh code/repo/update.sh ./artifacts ./pages
+        
+      - name: Generate Website
+        run: |
+          sh code/repo/website.sh ./pages
 
       - name: Commit and push
         working-directory: pages
