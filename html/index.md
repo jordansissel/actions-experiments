@@ -55,13 +55,13 @@ You may download the dnf/yum repo configuration or use the installation recipe b
 
 ## Full Installation Recipe
 
-Install the `dnf config-manager` plugin:
+If you are running dnf v4, you will need to install the dnf config-manager plugin. You can check the version by checking the first line output from `dnf --version`. Users of dnf v5 can skip this step.
 
 ```
 sudo dnf install -y dnf-plugins-core
 ```
 
-Add the fpm package repository:
+Now, use `dnf config-manager` to add the fpm repository:
 
 ```
 distro="$(sed -rne 's/^ID="?([^"]+)"?/\1/p' /etc/os-release)"
