@@ -46,6 +46,7 @@ jobs:
 
       - name: Update package repositories
         run: |
+          [ ! -d "./pages/packages" ] && mkdir ./pages/packages
           sh code/repo/update.sh ./artifacts ./pages/packages
         
       - name: Generate Website
