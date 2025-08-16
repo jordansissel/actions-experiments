@@ -7,13 +7,18 @@ fail() {
 
 set -e 
 
-workdir="$1"
-[ -z "$workdir" ] && fail "Missing argument for work directory"
+source="$1"
+destination="$2"
+[ -z "$source" ] && fail "Missing argument for source directory"
+[ -z "$destination" ] && fail "Missing argument for work directory"
 
-base="$(dirname "$0")"
-html="$(dirname "$base")"/html
+docker run -i --volume "$source:/source:z" --volume "$destination:/destination:z" jekyll/minimal \
+  sh -c "usermod -u $(id -u) jekyll; jekyll build -s /source -d /destination --disable-disk-cache"
+# docker run -i --volume "$source:/source:z" --volume "$destination:/destination:z" jekyll/minimal sh -x <<SHELL
+# ls -ld /source
+# ls -ld /destination
 
-set -x
-pwd
-ls -d $workdir
-docker run --volume "$PWD:/srv/jekyll:z" --volume "$workdir:/workdir:z" jekyll/minimal sh -c "ls -ld /workdir; id; usermod -u $(id -u) jekyll; id; jekyll build -d /workdir --disable-disk-cache"
+# usermod -u $(id -u) jekyll
+
+# jekyll build -s /source -d /destination --disable-disk-cache
+# SHELL

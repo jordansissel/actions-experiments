@@ -53,7 +53,7 @@ jobs:
           ls -l ./pages
           id
 
-          sh code/repo/website.sh ./pages
+          sh code/repo/website.sh ./code/html ./pages
 
       - name: Commit and push
         working-directory: pages
