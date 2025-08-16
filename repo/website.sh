@@ -14,4 +14,6 @@ base="$(dirname "$0")"
 html="$(dirname "$0")"/../html
 
 cd "$html"
-docker run --volume "$PWD:/srv/jekyll:z" --volume "$workdir:/workdir:z" jekyll/minimal jekyll build -d "/workdir" --disable-disk-cache
+# Change the jekyll uid to match ours?
+# The jekyll in $PATH in this docker image will suexec to 'jekyll' which may not match our uid.
+docker run --volume "$PWD:/srv/jekyll:z" --volume "$workdir:/workdir:z" jekyll/minimal sh -c "usermod -u $(id -u) jekyll; jekyll build -d /workdir --disable-disk-cache"
