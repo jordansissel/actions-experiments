@@ -7,7 +7,7 @@ on:
     paths:
       - .github/actions/generate-website.yml
       - repo/website.sh
-      - html
+      - html/**
 
 env:
   registry: ghcr.io
