@@ -61,20 +61,30 @@ You may download the dnf/yum repo configuration or use the installation recipe b
 
 ## Full Installation Recipe
 
-If you are running dnf v4, you will need to install the dnf config-manager plugin. You can check the version by checking the first line output from `dnf --version`. Users of dnf v5 can skip this step.
+### DNF v5 (CentOS/Rocky/Alma 10, Fedora 42, etc) 
 
-```
-sudo dnf install -y dnf-plugins-core
-```
+You can check your dnf version with `dnf --version | head -1`.
 
-Now, use `dnf config-manager` to add the fpm repository:
+The following commands will download the fpm repository entry onto your system:
 
 ```
 distro="$(sed -rne 's/^ID="?([^"]+)"?/\1/p' /etc/os-release)"
+
 sudo dnf config-manager addrepo --from-repofile=https://jordansissel.github.io/actions-experiments/config/${distro}/fpm.repo
 ```
 
-Install fpm:
+### DNF v4 (CentOS/Rocky/Alma 9 and older)
+
+The following commands will download the fpm repository entry onto your system:
+
+```
+distro="$(sed -rne 's/^ID="?([^"]+)"?/\1/p' /etc/os-release)"
+
+sudo curl -o /etc/yum.repos.d/fpm.repo https://jordansissel.github.io/actions-experiments/config/${distro}/fpm.repo
+```
+
+## Install fpm
+
 
 ```
 sudo dnf install fpm
