@@ -1,0 +1,5 @@
+Types: deb
+URIs: https://jordansissel.github.io/actions-experiments/packages/DISTRO
+Suites: CODENAME
+Components: main
+Signed-By: /usr/share/keyrings/fpm-archive-keyring.pgp
