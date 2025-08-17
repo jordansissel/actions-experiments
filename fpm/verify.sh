@@ -36,12 +36,12 @@ setup() {
     fail "Cannot install package because the file doesn't exist: $1"
   fi
 
-  FLAVOR="$(flavor "$system_id" "$system_version")"
+  FLAVOR="$(flavor "$ID" "$VERSION")"
 
   echo "[Detected OS: $ID $VERSION]"
   case "${FLAVOR}" in
     deb) 
-      apt-get update
+      apt-get update --quiet
 
       # apt-get install can install local files, but they have to appear to be a path.
       # So "apt-get install foo.deb" won't work because it only looks online,
