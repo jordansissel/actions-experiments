@@ -1,0 +1,38 @@
+Origin: the fpm project
+Label: fpm
+Suite: stable
+Codename: bookworm
+Date: Sun, 17 Aug 2025 02:39:45 UTC
+Architectures: amd64 arm64 i386
+Components: main
+Description: fpm
+MD5Sum:
+ a9fedcead14f790f9ae9cca4ada7ec3c 517 main/binary-amd64/Packages
+ 4968ae4d2f95067fce7b5e548798b739 389 main/binary-amd64/Packages.gz
+ f7f6b62d968b82ed3a7d6d73b848f5fe 104 main/binary-amd64/Release
+ a9fedcead14f790f9ae9cca4ada7ec3c 517 main/binary-arm64/Packages
+ 4968ae4d2f95067fce7b5e548798b739 389 main/binary-arm64/Packages.gz
+ 434d4011b0e4ce6e7239952bd2ac8088 104 main/binary-arm64/Release
+ a9fedcead14f790f9ae9cca4ada7ec3c 517 main/binary-i386/Packages
+ 4968ae4d2f95067fce7b5e548798b739 389 main/binary-i386/Packages.gz
+ f5cd048e656ac55efd379e46b8d2ddde 103 main/binary-i386/Release
+SHA1:
+ 5138393f7a72c3cfaa472faf4612e0990c9e650d 517 main/binary-amd64/Packages
+ 25df42694b48aae76595ee66f6950cb44c90d482 389 main/binary-amd64/Packages.gz
+ b7bf1008d023e5ae81c3e0f0d12ae5f46c39a406 104 main/binary-amd64/Release
+ 5138393f7a72c3cfaa472faf4612e0990c9e650d 517 main/binary-arm64/Packages
+ 25df42694b48aae76595ee66f6950cb44c90d482 389 main/binary-arm64/Packages.gz
+ 78b9239dad9d31b3cd68ec696589ceeacaaacac9 104 main/binary-arm64/Release
+ 5138393f7a72c3cfaa472faf4612e0990c9e650d 517 main/binary-i386/Packages
+ 25df42694b48aae76595ee66f6950cb44c90d482 389 main/binary-i386/Packages.gz
+ 20fa98dc6d1a103f4e13f3d592cb900c372036dd 103 main/binary-i386/Release
+SHA256:
+ 751c00c60f6a9773f20cc82b040522eace16e1c15111305e7f49b5567a0cdc4f 517 main/binary-amd64/Packages
+ ef5382633877ac6bb69f834c2d4287494dfef68752f6c1fdb9f74db398aaa568 389 main/binary-amd64/Packages.gz
+ da10a7e9e8a568ca8e58fcdd5a0d4d6391ec4dbb3690bbc511f3972ad2d60a01 104 main/binary-amd64/Release
+ 751c00c60f6a9773f20cc82b040522eace16e1c15111305e7f49b5567a0cdc4f 517 main/binary-arm64/Packages
+ ef5382633877ac6bb69f834c2d4287494dfef68752f6c1fdb9f74db398aaa568 389 main/binary-arm64/Packages.gz
+ 018040f10fe6f896937b283eb59f2fbbc06e301e54b4bc77478d4ce7774a55ee 104 main/binary-arm64/Release
+ 751c00c60f6a9773f20cc82b040522eace16e1c15111305e7f49b5567a0cdc4f 517 main/binary-i386/Packages
+ ef5382633877ac6bb69f834c2d4287494dfef68752f6c1fdb9f74db398aaa568 389 main/binary-i386/Packages.gz
+ 509307f4da731d40bc5681d3e0a76ec072960c5a0a2e269cbb4836d0715f6091 103 main/binary-i386/Release

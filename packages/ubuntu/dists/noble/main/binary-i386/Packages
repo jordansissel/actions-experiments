@@ -1,0 +1,18 @@
+Package: fpm
+Version: 1.16.0-1-ubuntu24.04
+License: unknown
+Vendor: none
+Architecture: all
+Maintainer: <@buildkitsandbox>
+Installed-Size: 2209
+Depends: rpm, binutils, ruby, tar
+Homepage: http://example.com/no-uri-given
+Priority: optional
+Section: default
+Filename: pool/main/f/fpm/fpm_1.16.0-1-ubuntu24.04_all.deb
+Size: 589536
+SHA256: 3bf3852d139dccb3a1ffd968631395b059ddfdc288019aff71c9bf84a0dba741
+SHA1: c38e1355841d70883a7888b3ad76f4738b4a1184
+MD5sum: 5a11667139b89fe2baf04c4e9112da5f
+Description: no description given
+

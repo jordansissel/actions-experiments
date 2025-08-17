@@ -1,0 +1,18 @@
+Codename: bullseye
+Architectures: amd64 arm64 i386
+Components: main
+Suite: stable
+SignWith: 5AA67E409BD475CBA7586206BC8204D715CEC858
+Origin: the fpm project
+Label: fpm
+Description: fpm
+
+Codename: bookworm
+Architectures: amd64 arm64 i386
+Components: main
+Suite: stable
+SignWith: 5AA67E409BD475CBA7586206BC8204D715CEC858
+Origin: the fpm project
+Label: fpm
+Description: fpm
+

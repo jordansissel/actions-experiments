@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Package Repository Configuration</title>
+<meta name="generator" content="Jekyll v4.2.2" />
+<meta property="og:title" content="Package Repository Configuration" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://jordansissel.github.io/actions-experiments/" />
+<meta property="og:url" content="https://jordansissel.github.io/actions-experiments/" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Package Repository Configuration" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebSite","headline":"Package Repository Configuration","url":"https://jordansissel.github.io/actions-experiments/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/actions-experiments/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://jordansissel.github.io/actions-experiments/feed.xml" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/actions-experiments/"></a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/actions-experiments/">Package Repository Configuration</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="home"><h1 class="page-heading">Package Repository Configuration</h1><p>Table of Contents:</p>
+
+<ul>
+  <li><a href="#debian-and-ubuntu">Debian and Ubuntu</a></li>
+  <li><a href="#fedora-and-rocky-linux">Fedora and Rocky Linux</a></li>
+</ul>
+
+<h1 id="debian-and-ubuntu">Debian and Ubuntu</h1>
+
+<h2 id="install-the-repository-public-key">Install the repository public key</h2>
+
+<p>You will need to download the <a href="packages/repository.asc">public GPG key</a> and store it on your system as <code class="language-plaintext highlighter-rouge">/usr/share/keyrings/fpm-archive-keyring.pgp</code>.</p>
+
+<p>To achieve this, the following script can be copied into a terminal. The script requires <code class="language-plaintext highlighter-rouge">curl</code>, <code class="language-plaintext highlighter-rouge">gpg</code>, and <code class="language-plaintext highlighter-rouge">sudo</code> to be available.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl -Ls https://jordansissel.github.io/actions-experiments/packages/repository.asc | gpg --dearmor | sudo tee /usr/share/keyrings/fpm-archive-keyring.pgp &gt; /dev/null
+</code></pre></div></div>
+
+<h2 id="add-the-repository-to-apt">Add the repository to apt</h2>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo tee /etc/apt/sources.list.d/fpm.sources &lt;&lt;SOURCES &gt; /dev/null
+Types: deb
+URIs: https://jordansissel.github.io/actions-experiments/packages/$(sed -rne 's/^ID="?([^"]+)"?$/\1/p' /etc/os-release)
+Suites: $(sed -rne 's/^VERSION_CODENAME="?([^"]+)"?$/\1/p' /etc/os-release)
+Components: main
+Signed-By: /usr/share/keyrings/fpm-archive-keyring.pgp
+SOURCES
+</code></pre></div></div>
+
+<h2 id="add-a-pinning-configuration">Add a pinning configuration</h2>
+
+<p>This pin configuration should prevent this repository from providing packages that override anything in the base OS.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo tee /etc/apt/preferences.d/fpm.pref &lt;&lt;PREFS &gt; /dev/null
+Package: *
+Pin: origin jordansissel.github.io
+Pin-Priority: 100
+PREFS
+</code></pre></div></div>
+
+<h1 id="red-hat-and-derivatives">Red Hat and Derivatives</h1>
+
+<p class="highlight">Red Hat and Derivatives include: CentOS, Fedora, Rocky Linux, Alma Linux, Amazon Linux</p>
+
+<p>You may download the dnf/yum repo configuration or use the installation recipe below:</p>
+
+<h2 id="yumdnf-repo-files">Yum/DNF Repo files</h2>
+
+<ul>
+  <li><a href="config/centos/fpm.repo">CentOS</a></li>
+  <li><a href="config/fedora/fpm.repo">Fedora</a></li>
+  <li><a href="config/rocky/fpm.repo">Rocky</a></li>
+  <li><a href="config/almalinux/fpm.repo">Alma</a></li>
+  <li><a href="config/amzn/fpm.repo">Amazon Linux</a></li>
+</ul>
+
+<h2 id="full-installation-recipe">Full Installation Recipe</h2>
+
+<p>If you are running dnf v4, you will need to install the dnf config-manager plugin. You can check the version by checking the first line output from <code class="language-plaintext highlighter-rouge">dnf --version</code>. Users of dnf v5 can skip this step.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo dnf install -y dnf-plugins-core
+</code></pre></div></div>
+
+<p>Now, use <code class="language-plaintext highlighter-rouge">dnf config-manager</code> to add the fpm repository:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>distro="$(sed -rne 's/^ID="?([^"]+)"?/\1/p' /etc/os-release)"
+sudo dnf config-manager addrepo --from-repofile=https://jordansissel.github.io/actions-experiments/config/${distro}/fpm.repo
+</code></pre></div></div>
+
+<p>Install fpm:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo dnf install fpm
+</code></pre></div></div>
+
+</div>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/actions-experiments/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading"></h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name"></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p></p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

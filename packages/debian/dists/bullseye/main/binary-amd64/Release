@@ -1,0 +1,6 @@
+Archive: stable
+Component: main
+Origin: the fpm project
+Label: fpm
+Architecture: amd64
+Description: fpm

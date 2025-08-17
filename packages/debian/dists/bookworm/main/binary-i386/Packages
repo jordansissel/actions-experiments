@@ -1,0 +1,18 @@
+Package: fpm
+Version: 1.16.0-1-debian12
+License: unknown
+Vendor: none
+Architecture: all
+Maintainer: <@buildkitsandbox>
+Installed-Size: 2212
+Depends: rpm, binutils, ruby, tar
+Homepage: http://example.com/no-uri-given
+Priority: optional
+Section: default
+Filename: pool/main/f/fpm/fpm_1.16.0-1-debian12_all.deb
+Size: 589746
+SHA256: c7e3cef18557ea69bd66087a7a7079530ac272f4886f9319986de3b476ab1c86
+SHA1: b7fad5431cd782a15fb50f564a3b92fcf1314587
+MD5sum: 1ec046d893e059950a252bb2bab7582e
+Description: no description given
+
