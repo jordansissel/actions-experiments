@@ -91,18 +91,27 @@ PREFS
 
 <h2 id="full-installation-recipe">Full Installation Recipe</h2>
 
-<p>If you are running dnf v4, you will need to install the dnf config-manager plugin. You can check the version by checking the first line output from <code class="language-plaintext highlighter-rouge">dnf --version</code>. Users of dnf v5 can skip this step.</p>
+<h3 id="dnf-v5-centosrockyalma-10-fedora-42-etc">DNF v5 (CentOS/Rocky/Alma 10, Fedora 42, etc)</h3>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo dnf install -y dnf-plugins-core
-</code></pre></div></div>
+<p>You can check your dnf version with <code class="language-plaintext highlighter-rouge">dnf --version | head -1</code>.</p>
 
-<p>Now, use <code class="language-plaintext highlighter-rouge">dnf config-manager</code> to add the fpm repository:</p>
+<p>The following commands will download the fpm repository entry onto your system:</p>
 
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>distro="$(sed -rne 's/^ID="?([^"]+)"?/\1/p' /etc/os-release)"
+
 sudo dnf config-manager addrepo --from-repofile=https://jordansissel.github.io/actions-experiments/config/${distro}/fpm.repo
 </code></pre></div></div>
 
-<p>Install fpm:</p>
+<h3 id="dnf-v4-centosrockyalma-9-and-older">DNF v4 (CentOS/Rocky/Alma 9 and older)</h3>
+
+<p>The following commands will download the fpm repository entry onto your system:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>distro="$(sed -rne 's/^ID="?([^"]+)"?/\1/p' /etc/os-release)"
+
+sudo curl -o /etc/yum.repos.d/fpm.repo https://jordansissel.github.io/actions-experiments/config/${distro}/fpm.repo
+</code></pre></div></div>
+
+<h2 id="install-fpm">Install fpm</h2>
 
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo dnf install fpm
 </code></pre></div></div>
