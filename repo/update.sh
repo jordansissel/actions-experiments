@@ -14,7 +14,7 @@ flavor() {
 
   case "${ID}" in
     ubuntu|debian) echo "deb" ;;
-    fedora|almalinux|rocky|amzn|almalinux) echo "rpm" ;;
+    fedora|almalinux|rocky|amzn|almalinux|centos) echo "rpm" ;;
     *) fail "Unsupported/unexpected distro: ${ID}" ;;
   esac
 }

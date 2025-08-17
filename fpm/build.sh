@@ -12,7 +12,7 @@ flavor() {
 
   case "${ID}" in
     ubuntu|debian) FLAVOR="deb" ;;
-    fedora|almalinux|rocky|amzn|almalinux) FLAVOR="rpm" ;;
+    fedora|almalinux|rocky|amzn|almalinux|centos) FLAVOR="rpm" ;;
     *) fail "Unsupported/unexpected distro: ${ID}" ;;
   esac
 }
