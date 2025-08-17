@@ -32,6 +32,11 @@ extract_packages() {
   | ARTIFACTSDIR="$ARTIFACTSDIR" xargs -P4 -n2 sh -c 'mkdir "$ARTIFACTSDIR/$1"; ls -ld "$ARTIFACTSDIR/$1"; docker run --user="$(id -u):$(id -g)" --volume "$ARTIFACTSDIR/$1:/out:z" "$2" sh -c "cp /tmp/target/* /out"' -
 }
 
+verify_packages() {
+  jq < "$WORKDIR/metadata.json" -r 'to_entries[] | select(.value["containerimage.digest"] != null and .key != "repotool") | "\(.key) \(.value["containerimage.digest"])"' \
+  | xargs -P4 -n2 sh -c 'docker run --volume "./verify.sh:/tmp/verify.sh:z" "$2" sh -c "ls -1d /tmp/target/*.rpm /tmp/target/*.deb 2> /dev/null | xargs -n1 sh /tmp/verify.sh"' -
+}
+
 cleanup() {
   rm "$ARTIFACTSDIR"/fpm-*/{fpm*,package.json}
   rm "$ARTIFACTSDIR"/metadata.json
@@ -63,6 +68,8 @@ build_web() {
 build_images
 
 extract_packages
+
+verify_packages
 
 build_repo
 
