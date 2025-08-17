@@ -5,19 +5,18 @@ variable images {
     "debian:11",
     "debian:12",
     "fedora:42",
-    "rockylinux/rockylinux:9",
-    "rockylinux/rockylinux:10",
     "ubuntu:22.04",
     "ubuntu:24.04",
+    "almalinux:8",
     "almalinux:9",
     "almalinux:10",
+    "rockylinux/rockylinux:8",
+    "rockylinux/rockylinux:9",
+    "rockylinux/rockylinux:10",
+    "quay.io/centos/centos:stream8",
+    "quay.io/centos/centos:stream9",
+    "quay.io/centos/centos:stream10",
     "amazonlinux:2023",
-    #"quay.io/centos/centos:stream10",
-    #"quay.io/centos/centos:stream9",
-    
-    # TODO: Do builds for older distros? Like rocky 8 has ruby 2.5,
-    # but fpm depends on dotenv which requires ruby 3
-    # "rockylinux:8", ships ruby 2.5, and dotenv requires Ruby>3.0
   ]
 }
 
