@@ -31,6 +31,8 @@ jobs:
           - "almalinux:9"
           - "almalinux:10"
           - "amazonlinux:2023"
+          - "quay.io/centos/centos:stream10"
+          - "quay.io/centos/centos:stream9"
 
     env:
       # docker/build-push-action is documented to output an 'imageid', but in
