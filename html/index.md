@@ -44,14 +44,20 @@ Pin-Priority: 100
 PREFS
 ```
 
-# Fedora and Rocky Linux
+# Red Hat and Derivatives
+
+{: .highlight }
+Red Hat and Derivatives include: CentOS, Fedora, Rocky Linux, Alma Linux, Amazon Linux
 
 You may download the dnf/yum repo configuration or use the installation recipe below:
 
 ## Yum/DNF Repo files
 
+* [CentOS](config/centos/fpm.repo)
 * [Fedora](config/fedora/fpm.repo)
 * [Rocky](config/rocky/fpm.repo)
+* [Alma](config/almalinux/fpm.repo)
+* [Amazon Linux](config/amzn/fpm.repo)
 
 ## Full Installation Recipe
 
