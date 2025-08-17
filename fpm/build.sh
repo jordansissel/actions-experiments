@@ -47,7 +47,17 @@ osrel() {
 refresh_packages() {
   case "${FLAVOR}" in
     deb) apt-get update --quiet ;;
-    rpm) dnf makecache ;;
+    rpm)
+      ID="$(osrel ID)"
+      VERSION="$(osrel VERSION_ID)"
+      if [ "$ID" = "centos" -a "$VERSION" = "8" ] ; then
+        echo "=> CentOS 8 detected. Patching yum repos."
+        # CentOS 8 is vaulted/archived. Patch the yum repos to point there.
+        sed -i -e '/^mirrorlist/d; s@#baseurl=http://mirror.centos.org@baseurl=http://vault.centos.org@' /etc/yum.repos.d/CentOS-*
+      fi
+
+      dnf makecache
+      ;;
     *)
       fail "Unsupported OS: ${ID}"
       ;;
