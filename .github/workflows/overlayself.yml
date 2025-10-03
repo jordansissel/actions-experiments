@@ -17,8 +17,8 @@ jobs:
           done
 
           echo "Without mounts"
-          docker run ubuntu:24.04 dpkg -l
+          docker run ubuntu:24.04 dpkg -l | wc -l
 
           echo "With mounts"
-          docker run --volume host-etc:/etc --volume host-usr:/usr --volume host-var:/var ubuntu:24.04 dpkg -l
+          docker run --volume host-etc:/etc --volume host-usr:/usr --volume host-var:/var ubuntu:24.04 dpkg -l | wc -l
 
