@@ -17,6 +17,6 @@ jobs:
           done
 
           docker run --name lol -i --volume host-etc:/etc --volume host-usr:/usr --volume host-var:/var ubuntu:24.04 sh << EOF
-            dpkg -l | wc -l
+            apt-get update
+            apt-get install -y --download-only python3-django
           EOF
-
