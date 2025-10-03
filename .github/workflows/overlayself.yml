@@ -1,0 +1,24 @@
+name: Overlay Self?
+on:
+  workflow_dispatch:
+
+jobs:
+  system-info:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Overlay
+        run: |
+          mkdir -p /opt/hostroot/{etc,usr,var}/{work,diff}
+
+          for path in /etc /usr /var ; do
+            name="$(basename $path)"
+            docker volume create --driver local --opt type=overlay --opt o=lowerdir=$path,upperdir=/opt/hostroot/$name/diff,workdir=/opt/hostroot/$name/work --opt device=overlay host-$name
+          done
+
+          echo "Without mounts"
+          docker run ubuntu:24.04 dpkg -l
+
+          echo "With mounts"
+          docker run --volume host-etc:/etc --volume host-usr:/usr --volume host-var:/var ubuntu:24.04 dpkg -l
+
