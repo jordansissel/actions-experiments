@@ -1,0 +1,27 @@
+name: System Info
+on:
+  workflow_dispatch:
+
+jobs:
+  system-info:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: System Info
+        run: |
+          (
+            echo '# Docker Info'
+            echo '```'
+            docker info
+            echo '```'
+
+            echo '# Mount Info'
+            echo '```'
+            mount
+            echo '```'
+
+            echo '# System Info'
+            echo '```'
+            cat /proc/cpuinfo
+            echo '```'
+          ) >> $GITHUB_STEP_SUMMARY
