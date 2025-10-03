@@ -16,7 +16,7 @@ jobs:
             docker volume create --driver local --opt type=overlay --opt o=lowerdir=$path,upperdir=/opt/hostroot/$name/diff,workdir=/opt/hostroot/$name/work --opt device=overlay host-$name
           done
 
-          docker run --name lol --volume host-etc:/etc --volume host-usr:/usr --volume host-var:/var ubuntu:24.04 sh << EOF
+          docker run --name lol -i --volume host-etc:/etc --volume host-usr:/usr --volume host-var:/var ubuntu:24.04 sh << EOF
             dpkg -l | wc -l
           EOF
 
