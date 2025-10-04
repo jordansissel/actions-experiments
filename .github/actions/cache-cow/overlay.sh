@@ -49,6 +49,8 @@ elif [ -L /etc/resolv.conf ]; then
 
   # Mount the linked location. Probably /run/systemd/resolv/stub-resolv.conf
   mkdir -p "/overlay/_$(dirname "$resolv")"
+  touch "/overlay/_${resolv}"
+
   mount -o bind "$resolv" "/overlay/_${resolv}"
 fi
 
