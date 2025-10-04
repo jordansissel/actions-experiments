@@ -29,8 +29,14 @@ runs:
   
   - name: "Run, you fools!"
     if: ${{ steps.cache.outputs.cache-hit != 'true' }}
-    shell: sh ${{ github.action_path }}/overlay.sh
-    run: ${{ inputs.run }}
+    shell: bash
+    run: |
+      # Write the 'run' input to a file we can pass to overlay.sh
+      cat > /tmp/setup.sh <<_EOF_
+      ${{ inputs.run }}
+      _EOF_
+
+      sh ${{ github.action_path }}/overlay.sh /tmp/setup.sh
 
   - name: "Cache COW explodes"
     shell: bash
