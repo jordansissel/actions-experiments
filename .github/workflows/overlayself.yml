@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  system-info:
+  cowtime:
     runs-on: ubuntu-latest
 
     steps:
@@ -31,11 +31,15 @@ jobs:
           echo ":> Volume args: $volume_args"
           sudo docker run --name lol --privileged -i $volume_args ubuntu:24.04 sh << EOF
             mount | grep "^overlay"
+            echo "set man-db/auto-update false" | sudo debconf-communicate
+            dpkg-reconfigure man-db < /dev/null || true
+            echo "path-exclude=/usr/share/doc/*" >>/etc/dpkg/dpkg.cfg.d/meddle
+            echo "path-exclude=/usr/share/man/*" >>/etc/dpkg/dpkg.cfg.d/meddle
+
             apt-get update
             apt-get install -y python3-django
           EOF
 
-          #find "${base}" -type f
           sudo umount "${base}/etc/_"
           sudo umount "${base}/usr/_"
           sudo umount "${base}/varlib/_"
