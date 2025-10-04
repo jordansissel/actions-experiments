@@ -35,7 +35,15 @@ jobs:
             apt-get install -y --download-only python3-django
           EOF
 
-          find "${base}" -type f
+          #find "${base}" -type f
+          sudo umount "${base}/etc"
+          sudo umount "${base}/usr"
+          sudo umount "${base}/varlib"
+
+          sudo rsync -av "${base}/varlib/_/" /var/lib
+
+          # Did it make it to the host?
+          dpkg -l python3-django
 
 
           # docker container export ...
