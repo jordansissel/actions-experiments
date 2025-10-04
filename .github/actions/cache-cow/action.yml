@@ -17,7 +17,14 @@ runs:
       sha256sum <<RUN_EOF | cut -f1 -d' ' | read hash
       ${{ inputs.run }}
       RUN_EOF
+
+      echo "Sha?"
+      sha256sum <<RUN_EOF
+      ${{ inputs.run }}
+      RUN_EOF
+
       echo "Hash: $hash"
+
       echo "hash=${hash}" >> $GITHUB_OUTPUT
 
   - name: Restore cache
