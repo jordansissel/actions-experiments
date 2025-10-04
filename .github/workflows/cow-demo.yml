@@ -2,6 +2,10 @@ name: Cache COW Demo
 
 on:
   workflow_dispatch:
+    inputs:
+      run: 
+        default: ""
+        description: The shell to run and cache the output.
 
 jobs:
   example:
