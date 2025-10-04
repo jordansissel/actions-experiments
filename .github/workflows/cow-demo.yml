@@ -5,8 +5,8 @@ on:
     inputs:
       run: 
         default: |
-          apt-get update;
-          apt-get install -y zsh
+          apt-get update -q;
+          apt-get install -q -y zsh
         description: The shell to run and cache the output.
 
 jobs:
