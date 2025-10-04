@@ -53,4 +53,4 @@ runs:
   - name: "Look at him now disappearing the cow!"
     shell: bash
     run: |
-      rm /var/cache/cow.tar.gz
+      sudo rm -f /var/cache/cow.tar.gz
