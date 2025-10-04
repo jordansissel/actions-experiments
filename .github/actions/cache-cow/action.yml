@@ -29,6 +29,12 @@ runs:
     shell: bash
     run: |
       sudo sh -x ${{ github.action_path }}/overlay.sh <<RUN_EOF
+      cat /etc/resolv.conf
+      cat /etc/nsswitch.conf
+      host google.com
+
+      echo ----
+
       ${{ inputs.run }}
       RUN_EOF
 

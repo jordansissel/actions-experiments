@@ -47,6 +47,13 @@ if [ "$(stat -c "%d" /etc)" -ne "$(stat -c "%d" /etc/resolv.conf)" ]; then
   mount -o bind /etc/resolv.conf /overlay/_/etc/resolv.conf
 fi
 
+echo "Host:"
+ls -ld /etc/resolv.conf
+grep . /etc/resolv.conf
+
+grep . /etc/nsswitch.conf
+
+echo "Chroot begins:"
 # bash input from stdin.
 chroot /overlay/_ bash
 
