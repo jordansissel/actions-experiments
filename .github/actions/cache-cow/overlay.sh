@@ -59,7 +59,7 @@ fi
 # bash input from stdin.
 chroot /overlay/_ bash
 
-tar -zcf /var/cache/cow.tar.gz -C /overlay/upper/ .
+tar -zcf cow.tar.gz -C /overlay/upper/ .
 
 if [ -n "$MOUNT_RESOLV_CONF" ]; then
   umount /overlay/_/etc/resolv.conf
