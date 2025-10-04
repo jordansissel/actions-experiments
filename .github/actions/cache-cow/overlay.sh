@@ -21,6 +21,8 @@ for path in $paths; do
 done
 
 mkdir /overlay/_/tmp
+chmod 1777 /overlay/_/tmp
+
 mkdir /overlay/_/run
 
 mkdir /overlay/_/proc
