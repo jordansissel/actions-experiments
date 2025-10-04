@@ -1,0 +1,23 @@
+name: Cache COW Demo
+
+on:
+  workflow_dispatch:
+
+jobs:
+  example:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Cache COW
+      uses: ./.github/actions/cache-cow
+      with:
+        run: |
+          apt-get update
+          apt-get install -y zsh
+
+    - name: Check it
+      run: |
+        ls -l /var/cache/cow.tar.gz
+        tar -ztf /var/cache/cow.tar.gz

@@ -1,0 +1,64 @@
+name: Cache COW (copy on write)
+description: |
+  Caches filesystem changes... or tries to.
+
+inputs:
+  run:
+    required: true
+    description: The shell script to run and cache its activity.
+
+runs:
+  using: composite
+  steps:
+  - name: Compute cache key
+    id: key
+    shell: bash
+    run: |
+      hash="$(echo "${{ inputs.run }}" | sha256sum | cut -f 1 -d ' ')"
+      echo "hash=${hash}" >> $GITHUB_OUTPUT
+
+  - name: Restore cache
+    uses: actions/cache/restore@v4
+    id: cache
+    with:
+      # Excluding patterns behave kinda weird...
+      # https://github.com/actions/toolkit/issues/713#issuecomment-1030643364
+      path: |
+        /var/cache/cow.tar.gz
+      key: cache-cow-${{ steps.key.outputs.hash }}
+  
+  - name: "Run, you fools!"
+    if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+    shell: sh ${{ github.action_path }}/overlay.sh
+    run: ${{ inputs.run }}
+
+  - name: "Cache COW explodes"
+    shell: bash
+    run: |
+      tar -zxf /var/cache/cow.tar.gz -C /
+      rm /var/cache/cow.tar.gz
+
+  - name: Save to cache
+    uses: actions/cache/save@v4
+    if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+    with:
+      # Excluding patterns behave kinda weird...
+      # https://github.com/actions/toolkit/issues/713#issuecomment-1030643364
+      path: |
+        /var/cache/apt/archives/*.deb
+        /var/lib/apt/lists/*InRelease*
+        /var/lib/apt/lists/*Packages*
+      key: ${{ steps.apt-cache.outputs.cache-primary-key }}
+
+  # https://github.com/actions/runner-images/issues/10977
+  - name: Disable man-db trigger for better install speed
+    shell: bash
+    run: |
+      echo "set man-db/auto-update false" | sudo debconf-communicate
+      sudo dpkg-reconfigure man-db < /dev/null || true
+
+  - name: apt-get install ${{ inputs.packages }}
+    shell: bash
+    run: |
+      time sudo apt-get install ${{ inputs.packages }}
+
