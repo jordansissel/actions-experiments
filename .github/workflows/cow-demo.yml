@@ -4,12 +4,15 @@ on:
   workflow_dispatch:
     inputs:
       run: 
-        default: ""
+        default: |
+          apt-get update
+          apt-get install -y zsh
         description: The shell to run and cache the output.
 
 jobs:
   example:
     runs-on: ubuntu-latest
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -17,9 +20,7 @@ jobs:
     - name: Cache COW
       uses: ./.github/actions/cache-cow
       with:
-        run: |
-          apt-get update
-          apt-get install -y zsh
+        run: ${{ inputs.run }}
 
     - name: Check it
       run: |
