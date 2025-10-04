@@ -1,0 +1,30 @@
+name: Cache COW Demo - Rust
+
+on:
+  workflow_dispatch:
+
+jobs:
+  example:
+    name: 💰🐄
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Cache COW - rustup
+      uses: ./.github/actions/cache-cow
+      with:
+        run: |
+         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s - -y
+
+    - name: Hello World
+      run: |
+        rustc --version
+        cat > hello.rs <<"RUST"
+        fn main() {
+          println!("Hello World!");
+        }
+        RUST
+        rustc hello.rs
+        ./hello
