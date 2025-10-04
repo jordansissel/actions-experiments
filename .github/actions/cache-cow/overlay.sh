@@ -13,8 +13,6 @@ find / -maxdepth 1 -type l -print0 | xargs -0 sh -c 'cp -d "$@" /overlay/_/' -
 
 paths="/usr /etc /var/lib"
 for path in $paths; do
-  name="$(echo $path | tr -d /)"
-
   mkdir -p "/overlay/upper/$path"
   mkdir -p "/overlay/work/$path"
   mkdir -p "/overlay/_/$path"
@@ -44,8 +42,11 @@ mkdir /overlay/_/var/log
 # Inside docker, /etc/resolv.conf is often mounted from the outside.
 if [ "$(stat -c "%d" /etc)" -ne "$(stat -c "%d" /etc/resolv.conf)" ]; then
   MOUNT_RESOLV_CONF=1
-  mount -o bind /etc/resolv.conf /overlay/_/etc/resolv.conf
+elif [ -L /etc/resolv.conf ]; then
+  MOUNT_RESOLV_CONF=1
 fi
+
+mount -o bind /etc/resolv.conf /overlay/_/etc/resolv.conf
 
 echo "Host:"
 ls -ld /etc/resolv.conf
@@ -59,7 +60,7 @@ chroot /overlay/_ bash
 
 tar -zcf /var/cache/cow.tar.gz -C /overlay/upper/ .
 
-if [ ! -z "$MOUNT_RESOLV_CONF" ]; then
+if [ -n "$MOUNT_RESOLV_CONF" ]; then
   umount /overlay/_/etc/resolv.conf
 fi
 
