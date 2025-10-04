@@ -24,5 +24,4 @@ jobs:
 
     - name: Check it
       run: |
-        ls -l /var/cache/cow.tar.gz
-        tar -ztf /var/cache/cow.tar.gz
+          dpkg -l zsh
