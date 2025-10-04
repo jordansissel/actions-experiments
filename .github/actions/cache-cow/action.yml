@@ -14,7 +14,9 @@ runs:
     id: key
     shell: bash
     run: |
-      hash="$(echo "${{ inputs.run }}" | sha256sum | cut -f 1 -d ' ')"
+      sha256sum <<RUN_EOF | cut -f1 -d' ' | read hash
+      ${{ inputs.run }}
+      RUN_EOF
       echo "hash=${hash}" >> $GITHUB_OUTPUT
 
   - name: Restore cache
