@@ -21,50 +21,30 @@ runs:
     uses: actions/cache/restore@v4
     id: cache
     with:
-      # Excluding patterns behave kinda weird...
-      # https://github.com/actions/toolkit/issues/713#issuecomment-1030643364
-      path: |
-        /var/cache/cow.tar.gz
+      path: /var/cache/cow.tar.gz
       key: cache-cow-${{ steps.key.outputs.hash }}
   
   - name: "Run, you fools!"
     if: ${{ steps.cache.outputs.cache-hit != 'true' }}
     shell: bash
     run: |
-      # Write the 'run' input to a file we can pass to overlay.sh
-      cat > /tmp/setup.sh <<_EOF_
+      sudo sh ${{ github.action_path }}/overlay.sh <<_EOF__
       ${{ inputs.run }}
       _EOF_
-
-      sudo sh ${{ github.action_path }}/overlay.sh /tmp/setup.sh
 
   - name: "Cache COW explodes"
     shell: bash
     run: |
       tar -zxf /var/cache/cow.tar.gz -C /
-      rm /var/cache/cow.tar.gz
 
   - name: Save to cache
     uses: actions/cache/save@v4
     if: ${{ steps.cache.outputs.cache-hit != 'true' }}
     with:
-      # Excluding patterns behave kinda weird...
-      # https://github.com/actions/toolkit/issues/713#issuecomment-1030643364
-      path: |
-        /var/cache/apt/archives/*.deb
-        /var/lib/apt/lists/*InRelease*
-        /var/lib/apt/lists/*Packages*
-      key: ${{ steps.apt-cache.outputs.cache-primary-key }}
+      path: /var/cache/cow.tar.gz
+      key: ${{ steps.cache.outputs.cache-primary-key }}
 
-  # https://github.com/actions/runner-images/issues/10977
-  - name: Disable man-db trigger for better install speed
+  - name: "Look at him now disappearing the cow!"
     shell: bash
     run: |
-      echo "set man-db/auto-update false" | sudo debconf-communicate
-      sudo dpkg-reconfigure man-db < /dev/null || true
-
-  - name: apt-get install ${{ inputs.packages }}
-    shell: bash
-    run: |
-      time sudo apt-get install ${{ inputs.packages }}
-
+      rm /var/cache/cow.tar.gz

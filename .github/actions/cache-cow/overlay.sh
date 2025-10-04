@@ -47,7 +47,8 @@ if [ "$(stat -c "%d" /etc)" -ne "$(stat -c "%d" /etc/resolv.conf)" ]; then
   mount -o bind /etc/resolv.conf /overlay/_/etc/resolv.conf
 fi
 
-chroot /overlay/_ "$@"
+# bash input from stdin.
+chroot /overlay/_ bash
 
 tar -zcf /var/cache/cow.tar.gz -C /overlay/upper/ .
 
