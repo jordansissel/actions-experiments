@@ -56,13 +56,6 @@ elif [ -L /etc/resolv.conf ]; then
   mount -o bind "$resolv" "/overlay/_${resolv}"
 fi
 
-echo "Host:"
-ls -ld /etc/resolv.conf
-grep . /etc/resolv.conf
-
-grep . /etc/nsswitch.conf
-
-echo "Chroot begins:"
 # bash input from stdin.
 chroot /overlay/_ bash
 
