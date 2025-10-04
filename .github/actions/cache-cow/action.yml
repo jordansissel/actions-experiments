@@ -21,7 +21,7 @@ runs:
     uses: actions/cache/restore@v4
     id: cache
     with:
-      path: /var/cache/cow.tar.gz
+      path: cow.tar.gz
       key: cache-cow-${{ steps.key.outputs.hash }}
   
   - name: "Run, you fools!"
@@ -41,16 +41,16 @@ runs:
   - name: "Cache COW explodes"
     shell: bash
     run: |
-      sudo tar -zxf /var/cache/cow.tar.gz -C /
+      sudo tar -zxf cow.tar.gz -C /
 
   - name: Save to cache
     uses: actions/cache/save@v4
     if: ${{ steps.cache.outputs.cache-hit != 'true' }}
     with:
-      path: /var/cache/cow.tar.gz
+      path: cow.tar.gz
       key: ${{ steps.cache.outputs.cache-primary-key }}
 
   - name: "Look at him now disappearing the cow!"
     shell: bash
     run: |
-      sudo rm -f /var/cache/cow.tar.gz
+      sudo rm -f cow.tar.gz
