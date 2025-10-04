@@ -42,11 +42,11 @@ mkdir /overlay/_/var/log
 # Inside docker, /etc/resolv.conf is often mounted from the outside.
 if [ "$(stat -c "%d" /etc)" -ne "$(stat -c "%d" /etc/resolv.conf)" ]; then
   MOUNT_RESOLV_CONF=1
+  mount -o bind /etc/resolv.conf /overlay/_/etc/resolv.conf
 elif [ -L /etc/resolv.conf ]; then
   MOUNT_RESOLV_CONF=1
+  mount -o bind $(readlink -f /etc/resolv.conf) /overlay/_/etc/resolv.conf
 fi
-
-mount -o bind /etc/resolv.conf /overlay/_/etc/resolv.conf
 
 echo "Host:"
 ls -ld /etc/resolv.conf
