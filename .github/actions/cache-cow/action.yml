@@ -29,13 +29,13 @@ runs:
     shell: bash
     run: |
       sudo sh -x ${{ github.action_path }}/overlay.sh <<RUN_EOF
-      cat /etc/resolv.conf
-      cat /etc/nsswitch.conf
-      host google.com
-
-      echo ----
+      echo "path-exclude=/usr/share/doc/*" >>/etc/dpkg/dpkg.cfg.d/meddle
+      echo "path-exclude=/usr/share/man/*" >>/etc/dpkg/dpkg.cfg.d/meddle
+      echo "set man-db/auto-update false" | debconf-communicate
 
       ${{ inputs.run }}
+
+      rm /etc/dpkg/dpkg.cfg.d/meddle
       RUN_EOF
 
   - name: "Cache COW explodes"
