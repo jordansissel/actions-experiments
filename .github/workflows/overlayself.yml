@@ -40,7 +40,7 @@ jobs:
           sudo umount "${base}/usr/_"
           sudo umount "${base}/varlib/_"
 
-          sudo rsync -av "${base}/varlib/_/" /var/lib
+          sudo rsync -av "${base}/varlib/upper/" /var/lib
 
           # Did it make it to the host?
           dpkg -l python3-django
