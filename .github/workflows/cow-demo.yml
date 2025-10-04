@@ -5,8 +5,8 @@ on:
     inputs:
       run: 
         default: |
-          apt-get update -q;
-          apt-get install -q -y firefox
+          apt-get update -qq;
+          apt-get install -qq -y firefox
         description: The shell to run and cache the output.
 
 jobs:

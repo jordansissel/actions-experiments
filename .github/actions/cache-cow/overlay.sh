@@ -12,12 +12,24 @@ mkdir /overlay/_
 find / -maxdepth 1 -type l -print0 | xargs -0 sh -c 'cp -d "$@" /overlay/_/' -
 
 paths="/usr /etc /var/lib"
-for path in $paths; do
+
+overlay() {
+  path="$1"
+  echo "Mounting COW overlay for path: $path"
   mkdir -p "/overlay/upper/$path"
   mkdir -p "/overlay/work/$path"
   mkdir -p "/overlay/_/$path"
 
   mount -t overlay overlay -o "lowerdir=${path},upperdir=/overlay/upper/${path},workdir=/overlay/work/${path}" "/overlay/_/${path}"
+}
+
+for path in $paths; do
+  overlay "$path"
+done
+
+# Any extra paths to overlay
+for path in "$@"; do
+  overlay "$path"
 done
 
 mkdir /overlay/_/tmp

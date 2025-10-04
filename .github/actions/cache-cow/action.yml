@@ -35,9 +35,7 @@ runs:
     if: ${{ steps.cache.outputs.cache-hit != 'true' }}
     shell: bash
     run: |
-      sudo sh -x ${{ github.action_path }}/overlay.sh <<RUN_EOF
-      #echo "set man-db/auto-update false" | debconf-communicate
-
+      sudo sh -x ${{ github.action_path }}/overlay.sh "$GITHUB_WORKSPACE" <<RUN_EOF
       # Disable man-db updates even if man-db isn't installed yet.
       echo "man-db  man-db/auto-update boolean false" | debconf-set-selections
 
