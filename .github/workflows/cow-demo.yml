@@ -11,6 +11,7 @@ on:
 
 jobs:
   example:
+    name: 💰🐄
     runs-on: ubuntu-latest
 
     steps:
