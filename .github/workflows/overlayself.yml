@@ -12,13 +12,16 @@ jobs:
           #!/bin/sh
           base=/opt/_overlay
 
-          # XXX: Just do /var/lib, not /var
+          volume_args=""
 
           for path in /etc /usr /var/lib ; do
-            volume_args=""
             name="$(echo $path | tr -d /)"
             overpath="${base}/${name}"
-            mkdir -p "${overpath}"/{work,upper,_}
+
+            mkdir -p "${overpath}"/work
+            mkdir -p "${overpath}"/upper
+            mkdir -p "${overpath}"/_
+
             echo ":> Creating overlay mount for $path (mounted to ${overpath}/_)"
             sudo mount -t overlay overlay -o "lowerdir=${path},upperdir=${overpath}/upper,workdir=${overpath}/work" "${overpath}/_"
 
