@@ -57,7 +57,7 @@ elif [ -L /etc/resolv.conf ]; then
 fi
 
 # bash input from stdin.
-chroot /overlay/_ bash
+chroot /overlay/_ bash -x
 
 tar -zcf cow.tar.gz -C /overlay/upper/ .
 
