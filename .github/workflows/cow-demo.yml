@@ -6,7 +6,7 @@ on:
       run: 
         default: |
           apt-get update -q;
-          apt-get install -q -y kde-full firefox xwayland
+          apt-get install -q -y firefox
         description: The shell to run and cache the output.
 
 jobs:
