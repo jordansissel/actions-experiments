@@ -28,9 +28,9 @@ runs:
     if: ${{ steps.cache.outputs.cache-hit != 'true' }}
     shell: bash
     run: |
-      sudo sh ${{ github.action_path }}/overlay.sh <<_EOF__
+      sudo sh -x ${{ github.action_path }}/overlay.sh <<RUN_EOF
       ${{ inputs.run }}
-      _EOF_
+      RUN_EOF
 
   - name: "Cache COW explodes"
     shell: bash
