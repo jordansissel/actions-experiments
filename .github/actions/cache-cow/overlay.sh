@@ -39,14 +39,17 @@ mount -o bind /var/cache /overlay/_/var/cache
 
 mkdir /overlay/_/var/log
 
-ls -ld /overlay/_/etc/resolv.conf || true
 # Inside docker, /etc/resolv.conf is often mounted from the outside.
 if [ "$(stat -c "%d" /etc)" -ne "$(stat -c "%d" /etc/resolv.conf)" ]; then
-  MOUNT_RESOLV_CONF=1
+  MOUNT_RESOLV_CONF=/overlay/_/etc/resolv.conf
   mount -o bind /etc/resolv.conf /overlay/_/etc/resolv.conf
 elif [ -L /etc/resolv.conf ]; then
-  MOUNT_RESOLV_CONF=1
-  mount -o bind $(readlink -f /etc/resolv.conf) /overlay/_/etc/resolv.conf
+  resolv="$(readlink -f /etc/resolv.conf)"
+  MOUNT_RESOLV_CONF="/overlay/_${resolv}"
+
+  # Mount the linked location. Probably /run/systemd/resolv/stub-resolv.conf
+  mkdir -p "/overlay/_$(dirname "$resolv")"
+  mount -o bind "$resolv" "/overlay/_${resolv}"
 fi
 
 echo "Host:"
