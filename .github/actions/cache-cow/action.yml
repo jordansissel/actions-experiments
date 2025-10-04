@@ -36,7 +36,7 @@ runs:
       ${{ inputs.run }}
       _EOF_
 
-      sh ${{ github.action_path }}/overlay.sh /tmp/setup.sh
+      sudo sh ${{ github.action_path }}/overlay.sh /tmp/setup.sh
 
   - name: "Cache COW explodes"
     shell: bash
