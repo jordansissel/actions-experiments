@@ -9,14 +9,27 @@ jobs:
     steps:
       - name: Overlay
         run: |
-          mkdir -p /opt/hostroot/{etc,usr,var}/{work,diff}
+          #!/bin/sh
+          base=/opt/_overlay
 
-          for path in /etc /usr /var ; do
-            name="$(basename $path)"
-            docker volume create --driver local --opt type=overlay --opt o=lowerdir=$path,upperdir=/opt/hostroot/$name/diff,workdir=/opt/hostroot/$name/work --opt device=overlay host-$name
+          # XXX: Just do /var/lib, not /var
+
+          for path in /etc /usr /var/lib ; do
+          volume_args=""
+            name="$(echo $path | tr -d /)"
+            overpath="${base}/${name}"
+            mkdir -p "${overpath}/{work,upper,_}"
+            sudo mount -t overlay overlay -o "lowerdir=${path},upperdir=${overpath}/upper,workdir=${overpath}/work" "${overpath}/_"
+
+            volume_args="${volume_args} --volume ${overpath}/_:${path}"
           done
 
-          docker run --name lol -i --volume host-etc:/etc --volume host-usr:/usr --volume host-var:/var ubuntu:24.04 sh << EOF
-            apt-get update
-            apt-get install -y --download-only python3-django
+          docker run --name lol -i $volume_args ubuntu:24.04 sh << EOF
+            mount
+            #apt-get update
+            #apt-get install -y --download-only python3-django
           EOF
+
+
+          # docker container export ...
+          # extract /etc, /usr, and specific /var paths like /var/lib/dpkg
