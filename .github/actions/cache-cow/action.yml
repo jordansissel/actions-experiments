@@ -41,7 +41,7 @@ runs:
   - name: "Cache COW explodes"
     shell: bash
     run: |
-      tar -zxf /var/cache/cow.tar.gz -C /
+      sudo tar -zxf /var/cache/cow.tar.gz -C /
 
   - name: Save to cache
     uses: actions/cache/save@v4
