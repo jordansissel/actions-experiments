@@ -31,8 +31,8 @@ jobs:
           echo ":> Volume args: $volume_args"
           sudo docker run --name lol --privileged -i $volume_args ubuntu:24.04 sh << EOF
             mount | grep "^overlay"
-            echo "set man-db/auto-update false" | sudo debconf-communicate
-            dpkg-reconfigure man-db < /dev/null || true
+            #echo "set man-db/auto-update false" | sudo debconf-communicate
+            #dpkg-reconfigure man-db < /dev/null || true
             echo "path-exclude=/usr/share/doc/*" >>/etc/dpkg/dpkg.cfg.d/meddle
             echo "path-exclude=/usr/share/man/*" >>/etc/dpkg/dpkg.cfg.d/meddle
 
@@ -44,9 +44,9 @@ jobs:
           sudo umount "${base}/usr/_"
           sudo umount "${base}/varlib/_"
 
-          sudo rsync -av "${base}/varlib/upper/" /var/lib
-          sudo rsync -av "${base}/usr/upper/" /usr
-          sudo rsync -av "${base}/etc/upper/" /etc
+          sudo rsync -a "${base}/varlib/upper/" /var/lib
+          sudo rsync -a "${base}/usr/upper/" /usr
+          sudo rsync -a "${base}/etc/upper/" /etc
 
           # Did it make it to the host?
           dpkg -l python3-django
