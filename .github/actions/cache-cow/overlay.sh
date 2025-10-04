@@ -39,6 +39,7 @@ mount -o bind /var/cache /overlay/_/var/cache
 
 mkdir /overlay/_/var/log
 
+ls -ld /overlay/_/etc/resolv.conf || true
 # Inside docker, /etc/resolv.conf is often mounted from the outside.
 if [ "$(stat -c "%d" /etc)" -ne "$(stat -c "%d" /etc/resolv.conf)" ]; then
   MOUNT_RESOLV_CONF=1
