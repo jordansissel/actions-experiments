@@ -18,7 +18,7 @@ jobs:
           volume_args=""
             name="$(echo $path | tr -d /)"
             overpath="${base}/${name}"
-            mkdir -p "${overpath}/{work,upper,_}"
+            mkdir -p "${overpath}"/{work,upper,_}
             sudo mount -t overlay overlay -o "lowerdir=${path},upperdir=${overpath}/upper,workdir=${overpath}/work" "${overpath}/_"
 
             volume_args="${volume_args} --volume ${overpath}/_:${path}"
