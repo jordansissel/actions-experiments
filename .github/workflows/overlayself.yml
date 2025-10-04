@@ -15,15 +15,17 @@ jobs:
           # XXX: Just do /var/lib, not /var
 
           for path in /etc /usr /var/lib ; do
-          volume_args=""
+            volume_args=""
             name="$(echo $path | tr -d /)"
             overpath="${base}/${name}"
             mkdir -p "${overpath}"/{work,upper,_}
+            echo ":> Creating overlay mount for $path (mounted to ${overpath}/_)"
             sudo mount -t overlay overlay -o "lowerdir=${path},upperdir=${overpath}/upper,workdir=${overpath}/work" "${overpath}/_"
 
             volume_args="${volume_args} --volume ${overpath}/_:${path}"
           done
 
+          echo ":> Volume args: $volume_args"
           sudo docker run --name lol --privileged -i $volume_args ubuntu:24.04 sh << EOF
             mount
             #apt-get update
