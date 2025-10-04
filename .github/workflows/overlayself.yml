@@ -24,7 +24,7 @@ jobs:
             volume_args="${volume_args} --volume ${overpath}/_:${path}"
           done
 
-          docker run --name lol -i $volume_args ubuntu:24.04 sh << EOF
+          sudo docker run --name lol --privileged -i $volume_args ubuntu:24.04 sh << EOF
             mount
             #apt-get update
             #apt-get install -y --download-only python3-django
