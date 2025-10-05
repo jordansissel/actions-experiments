@@ -2,6 +2,9 @@ name: Makefile CI
 
 on:
   workflow_dispatch:
+    inputs:
+      run:
+        default: echo ok
 
 jobs:
   build:
