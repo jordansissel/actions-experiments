@@ -13,4 +13,6 @@ jobs:
 
     steps:
     - run: env | grep INPUT
+      env:
+        INPUT_RUN: ${{ inputs.run }}
     
