@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - run: env | sort
+    - run: env
       env: 
         inputs: ${{ toJSON(inputs.*) }}
+        inpuys2: ${{ toJSON(inputs) }}
