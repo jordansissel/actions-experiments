@@ -12,5 +12,5 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - run: env | grep INPUT
+    - run: env | sort
       env: ${{ inputs }}
