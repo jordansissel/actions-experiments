@@ -14,4 +14,4 @@ jobs:
     steps:
     - run: env | sort
       env: 
-        inputs: ${{ toJSON(inputs) }}
+        inputs: ${{ toJSON(inputs.*) }}
