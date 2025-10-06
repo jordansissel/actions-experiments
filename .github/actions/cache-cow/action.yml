@@ -10,6 +10,11 @@ inputs:
 runs:
   using: composite
   steps:
+  - name: show
+    shell: bash
+    run: |
+      env
+
   - name: Compute cache key
     id: key
     shell: bash
