@@ -99,7 +99,7 @@ class Cow {
     if (source.isDirectory()) {
       await this.#mkdirP(mount_point);
     } else {
-      await this.#mkdirP(path.join(this.root, path.dirname(link)));
+      await this.#mkdirP(path.join(this.root, path.dirname(source_path)));
 
       // For a single file bind mount, the file must exist... so let's create it.
       // Use sudo here to use root permissions
