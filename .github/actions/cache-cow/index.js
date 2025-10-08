@@ -27,7 +27,7 @@ class Cow {
 
   async #rootSymlinks() {
     const toplevel = await fs.readdir("/", { "withFileTypes": true })
-    await exec.exec("ls", ["-l", this.root]);
+    await this.#exec("ls", ["-l", this.root]);
 
     toplevel.forEach(async dirent => {
       if (dirent.isSymbolicLink()) {
@@ -40,10 +40,15 @@ class Cow {
     });
   }
 
+  async #exec(command, args, options) {
+    console.log(`exec: ${[command].concat(args).join(" ")}`);
+    return Promise.resolve()
+    //return await exec.exec(command, args, options = {})
+  }
+
   async #sudo(command, args, options = {}) {
     const cmd = [command].concat(args)
-    console.log(`sudo: ${cmd.join(" ")}`);
-    return await exec.exec("sudo", cmd, options)
+    return await this.#exec("sudo", cmd, options)
   }
 
   async #mkdirP(path) {
@@ -77,13 +82,13 @@ async function main() {
   //if (process.getuid() !== 0) {
   //console.log("Rerunning as root");
   //process.env["RUNNER_USER"] = process.getuid();
-  //return exec.exec("sudo", ["-E", process.execPath].push(process.execArgv))
+  //return this.#exec("sudo", ["-E", process.execPath].push(process.execArgv))
   //}
 
   const paths = ["/usr", "/etc", "/var/lib"];
   const cow = new Cow(paths);
   await cow.setup()
-  await exec.exec("sh", ["-c", "mount | grep /overlay; true"]);
+  await this.#exec("sh", ["-c", "mount | grep /overlay; true"]);
 
   console.log("Script: ", core.getInput("run"));
   await cow.teardown()
