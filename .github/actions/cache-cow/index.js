@@ -14,6 +14,9 @@ class Cow {
 
   async setup() {
     this.#tmpfs(this.base);
+    //this.#mkdirP(path.join(this.base, "upper"));
+    //this.#mkdirP(path.join(this.base, "work"));
+    this.#mkdirP(this.root);
 
     this.#rootSymlinks();
 
