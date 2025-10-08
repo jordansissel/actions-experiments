@@ -74,6 +74,8 @@ function main() {
   const cow = new Cow()
   cow.setup()
   exec.exec("mount | grep /overlay");
+
+  console.log("Script: ", core.getInput("run"));
   cow.teardown()
 }
 
