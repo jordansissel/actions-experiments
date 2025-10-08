@@ -72,7 +72,7 @@ class Cow {
   }
 } // Cow
 
-function main() {
+async function main() {
   //if (process.getuid() !== 0) {
   //console.log("Rerunning as root");
   //process.env["RUNNER_USER"] = process.getuid();
@@ -81,15 +81,15 @@ function main() {
 
   const paths = ["/usr", "/etc", "/var/lib"];
   const cow = new Cow(paths);
-  cow.setup()
-  exec.exec("sh", ["-c", "mount | grep /overlay"]);
+  await cow.setup()
+  await exec.exec("sh", ["-c", "mount | grep /overlay; true"]);
 
   console.log("Script: ", core.getInput("run"));
-  cow.teardown()
+  await cow.teardown()
 }
 
 try {
-  main();
+  await main();
 } catch (error) {
   core.setFailed(error.message);
 }
