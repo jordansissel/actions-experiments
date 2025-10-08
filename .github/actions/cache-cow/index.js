@@ -50,8 +50,8 @@ class Cow {
           await this.#mkdirP(path.join(this.root, path.dirname(link)));
 
           // For a single file bind mount, the file must exist... so let's create it.
-          const fd = await fs.open(path.join(this.root, link), "a");
-          await fd.close()
+          // Use sudo here to use root permissions
+          await this.#sudo("touch", [path.join(this.root, link));
 
           await this.#bind(link, path.join(this.root, link));
         }
