@@ -2,7 +2,7 @@ import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import * as cache from "@actions/cache";
 import * as fs from "node:fs/promises";
-import * as path from "path";
+import * as path from "node:path";
 import * as crypto from "node:crypto";
 
 class Cow {
@@ -17,7 +17,9 @@ class Cow {
     const key = crypto.createHash("sha256")
     key.update(script);
     key.end();
-    this.cache_key = key.digest('hex')
+
+    // XXX: Make cache key configurable?
+    this.cache_key = `cache-cow-${key.digest('hex')}`
   }
 
   async run() {
@@ -34,9 +36,10 @@ class Cow {
     try {
       await this.#runShell();
 
-      await this.#capture()
+      await this.#capture();
     } catch (error) {
       console.error("Script failed", error);
+      core.setFailed(error.message);
     }
 
     await this.#teardown()
