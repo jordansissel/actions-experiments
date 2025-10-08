@@ -42,8 +42,12 @@ class Cow {
     return exec.exec("sudo", cmd, options)
   }
 
+  async #mkdirP(path) {
+    return this.#sudo("mkdir", ["-p", path]);
+  }
+
   async #tmpfs(mount_point) {
-    await io.mkdirP(mount_point);
+    await this.#mkdirP(mount_point);
     await this.#sudo("mount", ["-t", "tmpfs", "none", mount_point]);
 
     this.mounts.append(mount_point);
@@ -55,9 +59,9 @@ class Cow {
     const work = path.join(this.base, "work", source_path);
     const mount_point = path.join(this.root, source_path)
 
-    await io.mkdirP(upper);
-    await io.mkdirP(work);
-    await io.mkdirP(mount_point);
+    await this.#mkdirP(upper);
+    await this.#mkdirP(work);
+    await this.#mkdirP(mount_point);
 
     const opts = `lowerdir=${lower},upperdir=${upper},workdir=${work}`
     await this.#sudo("mount", ["-t", "overlay", "none", "-o", opts, mount_point]);
