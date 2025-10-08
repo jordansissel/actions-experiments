@@ -61,6 +61,12 @@ class Cow {
     };
   }
 
+  async runShell(script) {
+    const userspec = [process.getuid(), process.getgid()].join(":")
+
+    await this.#sudo("chroot", ["--userspec", userspec, "bash", "-xc"], { input: script })
+  }
+
 
   async #rootSymlinks() {
     const toplevel = await fs.readdir("/", { "withFileTypes": true })
@@ -145,8 +151,7 @@ async function main() {
   const cow = new Cow(paths);
   await cow.setup()
 
-  console.log("Script: ", core.getInput("run"));
-
+  await cow.runShell(core.getInput("run"))
   await cow.teardown()
 }
 
