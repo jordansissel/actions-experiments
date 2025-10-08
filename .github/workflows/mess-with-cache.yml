@@ -10,7 +10,7 @@ jobs:
     steps:
       - name: Hoodwink
         run: |
-          ln -s / /whoa
+          sudo ln -s / /whoa
 
       - name: Cache
         id: cache-it
