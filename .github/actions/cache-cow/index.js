@@ -1,5 +1,4 @@
 import * as core from "@actions/core";
-import * as io from "@actions/io";
 import * as exec from "@actions/exec";
 import * as fs from "node:fs/promises";
 import * as path from "path";
@@ -13,14 +12,12 @@ class Cow {
   }
 
   async setup() {
-    this.#tmpfs(this.base);
-    //this.#mkdirP(path.join(this.base, "upper"));
-    //this.#mkdirP(path.join(this.base, "work"));
-    this.#mkdirP(this.root);
+    await this.#tmpfs(this.base);
+    await this.#mkdirP(this.root);
 
 
-    this.#rootSymlinks();
-    this.paths.forEach(source_path => this.#overlay(source_path))
+    await this.#rootSymlinks();
+    await this.paths.forEach(async source_path => await this.#overlay(source_path))
   }
 
   async teardown() {
@@ -31,14 +28,14 @@ class Cow {
 
   async #rootSymlinks() {
     const toplevel = await fs.readdir("/", { "withFileTypes": true })
-    exec.exec("ls", ["-l", this.root]);
+    await exec.exec("ls", ["-l", this.root]);
 
     toplevel.forEach(async dirent => {
       if (dirent.isSymbolicLink()) {
         const target = await fs.readlink(path.join(dirent.parentPath, dirent.name));
         console.log(`Creating symlink in overlay (${this.root}/${dirent.name}) pointing to ${target}`);
 
-        fs.symlink(target, path.join(this.root, dirent.name));
+        await fs.symlink(target, path.join(this.root, dirent.name));
       }
     });
   }
