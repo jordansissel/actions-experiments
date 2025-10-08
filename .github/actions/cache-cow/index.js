@@ -74,7 +74,7 @@ class Cow {
   }
 
   async capture() {
-    await this.#sudo("tar", [ "-Jcf", "cow.tar.xz", "-C", this.root ]);
+    await this.#sudo("tar", [ "-Jcf", "cow.tar.xz", "-C", path.join(this.base, "upper") ].concat(this.paths));
 
     const key = crypto.createHash("sha256")
     key.update(core.getInput("run"));
