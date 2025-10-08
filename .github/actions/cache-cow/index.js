@@ -1,4 +1,5 @@
 import * as core from "@actions/core";
+import * as io from "@actions/io";
 import * as exec from "@actions/exec";
 import * as fs from "node:fs/promises";
 import * as path from "path";
