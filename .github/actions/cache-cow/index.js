@@ -87,6 +87,8 @@ class Cow {
           // /etc/resolv.conf is a symlink. Let's mount the linked location. It's probably /run/systemd/resolv/stub-resolv.conf
           const link = await fs.realpath(s);
           await this.#bind(link, path.join(this.root, link));
+        } else {
+          throw new Error(`Bug: Unexpected path when performing setup: ${s}`);
         }
       }
     }
