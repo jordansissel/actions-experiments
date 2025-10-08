@@ -3,7 +3,7 @@ import * as exec from "@actions/exec";
 import * as cache from "@actions/cache";
 import * as fs from "node:fs/promises";
 import * as path from "path";
-import "crypto";
+import * as crypto from "node:crypto";
 
 class Cow {
   constructor(paths) {
@@ -74,11 +74,11 @@ class Cow {
   }
 
   async capture() {
-    await this.#sudo("tar", [ "-Jcf", "cow.tar.xz", "-C", path.join(this.base, "upper") ].concat(this.paths));
+    await this.#sudo("tar", [ "-Jcf", "cow.tar.xz", "-C", path.join(this.base, "upper"), "." ]);
 
     const key = crypto.createHash("sha256")
     key.update(core.getInput("run"));
-    cache.saveCache("cow.tar.xz", key.digest())
+    cache.saveCache(["cow.tar.xz"], key.digest())
   }
 
 
