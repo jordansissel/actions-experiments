@@ -96,8 +96,7 @@ class Cow {
     const userspec = [process.getuid(), process.getgid()].join(":")
 
     console.log("Script: ", this.script);
-    await this.#sudo("chroot", ["--userspec", userspec, this.root, "ls", "-l"]);
-    await this.#sudo("chroot", ["--userspec", userspec, this.root, "bash", "-x"], { input: this.script });
+    await this.#sudo("chroot", ["--userspec", userspec, this.root, "bash", "-x"], { input: this.script, silent: false });
 
     //await this.#sudo("find", [ path.join(this.base, "upper") ])
   }
@@ -128,7 +127,10 @@ class Cow {
     if (options === undefined) {
       options = {}
     }
-    options.silent = true
+
+    if (!("silent" in options)) {
+      options.silent = true
+    }
 
     //console.log(`exec: ${[command].concat(args).join(" ")}`);
     //return Promise.resolve()
