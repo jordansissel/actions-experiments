@@ -23,7 +23,7 @@ class Cow {
       const p = path.join(this.root, s);
       if (s === "/tmp") {
         await this.#mkdirP(p);
-        await this.#sudo("chmod", [p, "1777"])
+        await this.#sudo("chmod", ["1777", p])
       } else if (s === "/dev") {
         await this.#bind(s, p)
       } else if (s === "/dev/pts") {
@@ -82,7 +82,7 @@ class Cow {
   }
 
   #exec(command, args, options) {
-    console.log(`exec: ${[command].concat(args).join(" ")}`);
+    //console.log(`exec: ${[command].concat(args).join(" ")}`);
     //return Promise.resolve()
     return exec.exec(command, args, options = {})
   }
