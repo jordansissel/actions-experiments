@@ -35,7 +35,8 @@ class Cow {
         const target = await fs.readlink(path.join(dirent.parentPath, dirent.name));
         console.log(`Creating symlink in overlay (${this.root}/${dirent.name}) pointing to ${target}`);
 
-        await fs.symlink(target, path.join(this.root, dirent.name));
+        //await fs.symlink(target, path.join(this.root, dirent.name));
+        await this.#sudo("ln", ["-s", target, path.join(this.root, dirent.name)]);
       }
     });
   }
