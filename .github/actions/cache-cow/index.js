@@ -41,8 +41,8 @@ class Cow {
   }
 
   async #sudo(command, args, options = {}) {
-    console.log(`sudo> ${cmd}`);
     const cmd = [command].concat(args)
+    console.log(`sudo: ${cmd}`);
     return await exec.exec("sudo", cmd, options)
   }
 
