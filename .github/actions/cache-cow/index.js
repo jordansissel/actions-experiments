@@ -78,7 +78,9 @@ class Cow {
 
     const key = crypto.createHash("sha256")
     key.update(core.getInput("run"));
-    cache.saveCache(["cow.tar.xz"], key.digest())
+    key.end();
+
+    cache.saveCache(["cow.tar.xz"], key.digest('hex'))
   }
 
 
