@@ -92,5 +92,6 @@ async function main() {
 try {
   await main();
 } catch (error) {
+  exec.exec("sudo", ["dmesg"]);
   core.setFailed(error.message);
 }
