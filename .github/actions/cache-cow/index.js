@@ -42,7 +42,7 @@ class Cow {
 
   async #sudo(command, args, options = {}) {
     const cmd = [command].concat(args)
-    console.log(`sudo: ${cmd}`);
+    console.log(`sudo: ${cmd.join(" ")}`);
     return await exec.exec("sudo", cmd, options)
   }
 
@@ -92,6 +92,7 @@ async function main() {
 try {
   await main();
 } catch (error) {
+  console.log("Failed :(");
   exec.exec("sudo", ["dmesg"]);
   core.setFailed(error.message);
 }
