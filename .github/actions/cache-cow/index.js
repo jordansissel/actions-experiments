@@ -125,6 +125,11 @@ class Cow {
   }
 
   #exec(command, args, options) {
+    if (options === undefined) {
+      options = {}
+    }
+    options.silent = true
+
     //console.log(`exec: ${[command].concat(args).join(" ")}`);
     //return Promise.resolve()
     return exec.exec(command, args, options)
