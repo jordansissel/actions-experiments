@@ -53,7 +53,7 @@ class Cow {
     await this.#mkdirP(mount_point);
     await this.#sudo("mount", ["-t", "tmpfs", "none", mount_point]);
 
-    this.mounts.append(mount_point);
+    this.mounts.push(mount_point);
   }
 
   async #overlay(source_path) {
@@ -68,7 +68,7 @@ class Cow {
 
     const opts = `lowerdir=${lower},upperdir=${upper},workdir=${work}`
     await this.#sudo("mount", ["-t", "overlay", "none", "-o", opts, mount_point]);
-    this.mounts.append(mount_point);
+    this.mounts.push(mount_point);
   }
 } // Cow
 
@@ -76,7 +76,7 @@ async function main() {
   //if (process.getuid() !== 0) {
   //console.log("Rerunning as root");
   //process.env["RUNNER_USER"] = process.getuid();
-  //return exec.exec("sudo", ["-E", process.execPath].append(process.execArgv))
+  //return exec.exec("sudo", ["-E", process.execPath].push(process.execArgv))
   //}
 
   const paths = ["/usr", "/etc", "/var/lib"];
