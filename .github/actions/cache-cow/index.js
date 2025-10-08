@@ -18,8 +18,8 @@ class Cow {
     //this.#mkdirP(path.join(this.base, "work"));
     this.#mkdirP(this.root);
 
-    this.#rootSymlinks();
 
+    this.#rootSymlinks();
     this.paths.forEach(source_path => this.#overlay(source_path))
   }
 
@@ -31,10 +31,13 @@ class Cow {
 
   async #rootSymlinks() {
     const toplevel = await fs.readdir("/", { "withFileTypes": true })
+    exec.exec("ls", ["-l", this.root]);
 
     toplevel.forEach(async dirent => {
       if (dirent.isSymbolicLink()) {
         const target = await fs.readlink(path.join(dirent.parentPath, dirent.name));
+        console.log(`Creating symlink in overlay (${this.root}/${dirent.name}) pointing to ${target}`);
+
         fs.symlink(target, path.join(this.root, dirent.name));
       }
     });
