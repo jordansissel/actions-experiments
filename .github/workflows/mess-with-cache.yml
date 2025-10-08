@@ -20,7 +20,7 @@ jobs:
           key: ${{ runner.os }}-ruby-build-${{ inputs.ruby_build_version }}
 
       - name: Generate
-        if: steps.cache-it.outputs.cache-hit != "true"
+        if: steps.cache-it.outputs.cache-hit != 'true'
         run: |
           rm -f /whoa
           sudo mkdir -p /whoa/usr/bin/hello.sh
@@ -33,4 +33,4 @@ jobs:
           ls -ld /whoa/usr/bin/hello.sh
           ls -ld /usr/bin/hello.sh
 
-          sh /usr/bin/hello.sh
+          sh /usr/bin/hello.
