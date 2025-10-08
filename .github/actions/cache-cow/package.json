@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "cache-cow",
   "version": "1.0.0",
   "description": "",

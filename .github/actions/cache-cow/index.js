@@ -15,21 +15,62 @@ class Cow {
     await this.#tmpfs(this.base);
     await this.#mkdirP(this.root);
 
+    for (const source_path of this.paths) {
+      await this.#overlay(source_path);
+    }
+
+    for (s of ["/tmp", "/dev", "/dev/pts", "/dev/console", "/var/cache", "/etc/resolv.conf"]) {
+      const p = path.join(this.root, s);
+      if (s === "/tmp") {
+        await this.#mkdirP(p);
+        await this.#sudo("chmod", [p, "1777"])
+      } else if (s === "/dev") {
+        await this.#bind(s, p)
+      } else if (s === "/dev/pts") {
+        await this.#bind(s, p)
+      } else if (s === "/dev/console") {
+        try {
+          // Bind /dev/console if it exists.
+          await fs.lstat(s)
+          await this.#bind(s, p)
+        } catch {
+          // ignore
+        }
+      } else if (s === "/var/cache") {
+        await this.#bind(s, p)
+      } else if (s === "/etc/resolv.conf") {
+        const resolv = await fs.lstat(s);
+        const etc = await fs.lstat("/etc");
+        if (etc.dev !== resolv.dev) {
+          // Inside docker, /etc/resolv.conf is often mounted from the outside.
+          await this.#bind(s);
+        } elseif(resolv.isSymbolicLink()) {
+          // Mount the linked location. Probably /run/systemd/resolv/stub-resolv.conf
+          const link = await fs.readlink(resolv);
+          await this.#mkdirP(path.join(this.root, path.basename(link)));
+
+          // For a single file bind mount, the file must exist... so let's create it.
+          const fd = await fs.open(path.join(this.root, link), "a");
+          await fd.close()
+          await this.#bind(link, path.join(this.root, link));
+        }
+      }
+    }
+
     await this.#rootSymlinks();
-    await this.paths.forEach(async source_path => await this.#overlay(source_path))
   }
 
   async teardown() {
-    this.mounts.reverse().forEach(async mount => {
+    for (const mount of this.mounts.reverse()) {
       await this.#sudo("umount", [mount]);
-    });
+    };
   }
 
   async #rootSymlinks() {
     const toplevel = await fs.readdir("/", { "withFileTypes": true })
     await this.#exec("ls", ["-l", this.root]);
 
-    toplevel.forEach(async dirent => {
+    for (const dirent of toplevel) {
       if (dirent.isSymbolicLink()) {
         const target = await fs.readlink(path.join(dirent.parentPath, dirent.name));
         console.log(`Creating symlink in overlay (${this.root}/${dirent.name}) pointing to ${target}`);
@@ -37,7 +78,7 @@ class Cow {
         //await fs.symlink(target, path.join(this.root, dirent.name));
         await this.#sudo("ln", ["-s", target, path.join(this.root, dirent.name)]);
       }
-    });
+    };
   }
 
   #exec(command, args, options) {
@@ -53,6 +94,12 @@ class Cow {
 
   async #mkdirP(path) {
     await this.#sudo("mkdir", ["-p", path]);
+  }
+
+  async #bind(source_path) {
+    const mount_point = path.join(this.root, source_path)
+    await this.#sudo("mount", ["-t", "bind", source_path, mount_point])
+    this.mounts.push(mount_point);
   }
 
   async #tmpfs(mount_point) {
@@ -90,6 +137,7 @@ async function main() {
   await cow.setup()
 
   console.log("Script: ", core.getInput("run"));
+
   await cow.teardown()
 }
 
