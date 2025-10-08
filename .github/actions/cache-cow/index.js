@@ -44,7 +44,7 @@ class Cow {
         if (etc.dev !== resolv.dev) {
           // Inside docker, /etc/resolv.conf is often mounted from the outside.
           await this.#bind(s);
-        } else if (resolv.isSymbolicLink()) {
+        } elseif(resolv.isSymbolicLink()) {
           // Mount the linked location. Probably /run/systemd/resolv/stub-resolv.conf
           const link = await fs.readlink(resolv);
           await this.#mkdirP(path.join(this.root, path.basename(link)));
@@ -145,6 +145,7 @@ try {
   await main();
 } catch (error) {
   console.log("Failed :(");
-  exec.exec("sudo", ["dmesg"]);
+  console.log(error);
+  //exec.exec("sudo", ["dmesg"]);
   core.setFailed(error.message);
 }
