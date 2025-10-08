@@ -6,14 +6,43 @@ import * as path from "path";
 import * as crypto from "node:crypto";
 
 class Cow {
-  constructor(paths) {
+  constructor(paths, script) {
     this.base = "/overlay";
     this.root = path.join(this.base, "_");
     this.mounts = [];
     this.paths = paths;
+
+    this.script = script;
+
+    const key = crypto.createHash("sha256")
+    key.update(script);
+    key.end();
+    this.cache_key = key.digest('hex')
   }
 
-  async setup() {
+  async run() {
+    const restore = await cache.restoreCache(["cow.tar.xz"], this.cache_key);
+    if (restore !== undefined) {
+      console.log(`Extracting COW... (Cache COW hit on key ${restore})`);
+
+      await this.#sudo("tar", [ "-Jvxf", "cow.tar.xz", "-C", "/" ]);
+      return
+    }
+
+    await this.#setup()
+
+    try {
+      await this.#runShell();
+
+      await this.#capture()
+    } catch (error) {
+      console.error("Script failed", error);
+    }
+
+    await this.#teardown()
+  }
+
+  async #setup() {
     await this.#tmpfs(this.base);
     await this.#mkdirP(this.root);
 
@@ -57,30 +86,26 @@ class Cow {
     await this.#rootSymlinks();
   }
 
-  async teardown() {
+  async #teardown() {
     for (const mount of this.mounts.reverse()) {
       await this.#sudo("umount", [mount]);
     };
   }
 
-  async runShell(script) {
+  async #runShell() {
     const userspec = [process.getuid(), process.getgid()].join(":")
 
-    console.log("Script: ", script);
+    console.log("Script: ", this.script);
     await this.#sudo("chroot", ["--userspec", userspec, this.root, "ls", "-l"]);
-    await this.#sudo("chroot", ["--userspec", userspec, this.root, "bash", "-x"], { input: script });
+    await this.#sudo("chroot", ["--userspec", userspec, this.root, "bash", "-x"], { input: this.script });
 
     //await this.#sudo("find", [ path.join(this.base, "upper") ])
   }
 
-  async capture() {
+  async #capture() {
     await this.#sudo("tar", [ "-Jcf", "cow.tar.xz", "-C", path.join(this.base, "upper"), "." ]);
 
-    const key = crypto.createHash("sha256")
-    key.update(core.getInput("run"));
-    key.end();
-
-    cache.saveCache(["cow.tar.xz"], key.digest('hex'))
+    await cache.saveCache(["cow.tar.xz"], this.cache_key)
   }
 
 
@@ -157,25 +182,9 @@ class Cow {
 } // Cow
 
 async function main() {
-  //if (process.getuid() !== 0) {
-  //console.log("Rerunning as root");
-  //process.env["RUNNER_USER"] = process.getuid();
-  //return this.#exec("sudo", ["-E", process.execPath].push(process.execArgv))
-  //}
-
   const paths = ["/usr", "/etc", "/var/lib"];
-  const cow = new Cow(paths);
-  await cow.setup()
-
-  try {
-    await cow.runShell(core.getInput("run"))
-
-    await cow.capture()
-  } catch (error) {
-    console.error("Script failed", error);
-  }
-
-  await cow.teardown()
+  const cow = new Cow(paths, core.getInput("run"));
+  cow.run();
 }
 
 try {
