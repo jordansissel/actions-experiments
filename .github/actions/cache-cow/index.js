@@ -114,9 +114,9 @@ class Cow {
   async #capture() {
     await this.#sudo("tar", [ "-Jcf", "cow.tar.xz", "-C", path.join(this.base, "upper"), "." ]);
 
-    await cache.saveCache(["cow.tar.xz"], this.cache_key)
+    console.log("Uploading captured changes to the cache.");
+    await cache.saveCache(["cow.tar.xz"], this.cache_key);
   }
-
 
   async #rootSymlinks() {
     const toplevel = await fs.readdir("/", { "withFileTypes": true })
