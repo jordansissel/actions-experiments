@@ -40,19 +40,19 @@ class Cow {
     });
   }
 
-  async #exec(command, args, options) {
+  #exec(command, args, options) {
     console.log(`exec: ${[command].concat(args).join(" ")}`);
     return Promise.resolve()
-    //return await exec.exec(command, args, options = {})
+    //return exec.exec(command, args, options = {})
   }
 
   async #sudo(command, args, options = {}) {
     const cmd = [command].concat(args)
-    return await this.#exec("sudo", cmd, options)
+    await this.#exec("sudo", cmd, options)
   }
 
   async #mkdirP(path) {
-    return await this.#sudo("mkdir", ["-p", path]);
+    await this.#sudo("mkdir", ["-p", path]);
   }
 
   async #tmpfs(mount_point) {
@@ -88,7 +88,6 @@ async function main() {
   const paths = ["/usr", "/etc", "/var/lib"];
   const cow = new Cow(paths);
   await cow.setup()
-  await this.#exec("sh", ["-c", "mount | grep /overlay; true"]);
 
   console.log("Script: ", core.getInput("run"));
   await cow.teardown()
