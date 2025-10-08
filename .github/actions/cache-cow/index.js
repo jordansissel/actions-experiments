@@ -40,13 +40,14 @@ class Cow {
     });
   }
 
-  #sudo(command, args, options = {}) {
+  async #sudo(command, args, options = {}) {
+    console.log(`sudo> ${cmd}`);
     const cmd = [command].concat(args)
-    return exec.exec("sudo", cmd, options)
+    return await exec.exec("sudo", cmd, options)
   }
 
-  #mkdirP(path) {
-    return this.#sudo("mkdir", ["-p", path]);
+  async #mkdirP(path) {
+    return await this.#sudo("mkdir", ["-p", path]);
   }
 
   async #tmpfs(mount_point) {
