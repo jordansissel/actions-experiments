@@ -15,7 +15,6 @@ class Cow {
     await this.#tmpfs(this.base);
     await this.#mkdirP(this.root);
 
-
     await this.#rootSymlinks();
     await this.paths.forEach(async source_path => await this.#overlay(source_path))
   }
@@ -41,12 +40,12 @@ class Cow {
     });
   }
 
-  async #sudo(command, args, options = {}) {
+  #sudo(command, args, options = {}) {
     const cmd = [command].concat(args)
     return exec.exec("sudo", cmd, options)
   }
 
-  async #mkdirP(path) {
+  #mkdirP(path) {
     return this.#sudo("mkdir", ["-p", path]);
   }
 
