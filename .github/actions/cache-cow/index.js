@@ -64,7 +64,7 @@ class Cow {
   async runShell(script) {
     const userspec = [process.getuid(), process.getgid()].join(":")
 
-    await this.#sudo("chroot", ["--userspec", userspec, "bash", "-xc"], { input: script })
+    await this.#sudo("chroot", ["--userspec", userspec, this.root, "bash", "-xc"], { input: script })
   }
 
 
