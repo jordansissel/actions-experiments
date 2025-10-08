@@ -68,7 +68,7 @@ class Cow {
     await this.#mkdirP(mount_point);
 
     const opts = `lowerdir=${lower},upperdir=${upper},workdir=${work}`
-    await this.#sudo("mount", ["-t", "overlay", "none", "-o", opts, mount_point]);
+    await this.#sudo("mount", ["-t", "overlay", "overlay", "-o", opts, mount_point]);
     this.mounts.push(mount_point);
   }
 } // Cow
