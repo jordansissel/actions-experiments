@@ -51,7 +51,7 @@ class Cow {
 
           // For a single file bind mount, the file must exist... so let's create it.
           // Use sudo here to use root permissions
-          await this.#sudo("touch", [path.join(this.root, link));
+          await this.#sudo("touch", [path.join(this.root, link)]);
 
           await this.#bind(link, path.join(this.root, link));
         }
@@ -66,6 +66,7 @@ class Cow {
       await this.#sudo("umount", [mount]);
     };
   }
+
 
   async #rootSymlinks() {
     const toplevel = await fs.readdir("/", { "withFileTypes": true })
@@ -125,6 +126,7 @@ class Cow {
     await this.#sudo("mount", ["-t", "overlay", "overlay", "-o", opts, mount_point]);
     this.mounts.push(mount_point);
   }
+
 } // Cow
 
 async function main() {
