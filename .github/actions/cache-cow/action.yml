@@ -8,11 +8,5 @@ inputs:
     description: The shell script to run and cache its activity.
 
 runs:
-  #using: node20
-  #main: index.js
-  using: composite
-  steps:
-  - name: show
-    shell: bash
-    run: |
-      env
+  using: node20
+  main: index.js
