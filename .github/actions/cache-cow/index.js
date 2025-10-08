@@ -47,12 +47,6 @@ class Cow {
         } else if (resolv.isSymbolicLink()) {
           // Mount the linked location. Probably /run/systemd/resolv/stub-resolv.conf
           const link = await fs.readlink(s);
-          await this.#mkdirP(path.join(this.root, path.dirname(link)));
-
-          // For a single file bind mount, the file must exist... so let's create it.
-          // Use sudo here to use root permissions
-          await this.#sudo("touch", [path.join(this.root, link)]);
-
           await this.#bind(link, path.join(this.root, link));
         }
       }
@@ -100,7 +94,18 @@ class Cow {
 
   async #bind(source_path) {
     const mount_point = path.join(this.root, source_path)
-    await this.#mkdirP(mount_point);
+    const source = await fs.lstat(source_path);
+
+    if (source.isDirectory()) {
+      await this.#mkdirP(mount_point);
+    } else {
+      await this.#mkdirP(path.join(this.root, path.dirname(link)));
+
+      // For a single file bind mount, the file must exist... so let's create it.
+      // Use sudo here to use root permissions
+      await this.#sudo("touch", [mount_point])
+    }
+
     await this.#sudo("mount", ["--bind", source_path, mount_point])
     this.mounts.push(mount_point);
   }
