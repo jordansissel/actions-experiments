@@ -50,11 +50,17 @@ class Cow {
       await this.#overlay(source_path);
     }
 
-    for (const s of ["/tmp", "/dev", "/dev/pts", "/dev/console", "/var/cache", "/etc/resolv.conf"]) {
+    for (const s of ["/tmp", "/run", "/proc", "/dev", "/dev/pts", "/dev/console", "/var/cache", "/var/log", "/etc/resolv.conf"]) {
       const p = path.join(this.root, s);
       if (s === "/tmp") {
         await this.#mkdirP(p);
         await this.#sudo("chmod", ["1777", p])
+      } else if (s === "/proc") {
+        await this.#mkdirP(p);
+        await this.#sudo("mount", ["-t", "proc", "proc", p])
+        this.mounts.push(p);
+      } else if (s === "/run") {
+        await this.#mkdirP(p);
       } else if (s === "/dev") {
         await this.#bind(s, p)
       } else if (s === "/dev/pts") {
@@ -62,13 +68,15 @@ class Cow {
       } else if (s === "/dev/console") {
         try {
           // Bind /dev/console if it exists.
-          await fs.lstat(s)
+          await fs.lstat(s) // throws exception if /dev/console doesn't exist, that's ok.
           await this.#bind(s, p)
         } catch {
           // ignore
         }
       } else if (s === "/var/cache") {
         await this.#bind(s, p)
+      } else if (s === "/var/log") {
+        await this.#mkdirP(p);
       } else if (s === "/etc/resolv.conf") {
         const resolv = await fs.lstat(s);
         const etc = await fs.lstat("/etc");
