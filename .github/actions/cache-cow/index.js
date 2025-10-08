@@ -72,7 +72,8 @@ function main() {
   //return exec.exec("sudo", ["-E", process.execPath].append(process.execArgv))
   //}
 
-  const cow = new Cow()
+  const paths = ["/usr", "/etc", "/var/lib"];
+  const cow = new Cow(paths);
   cow.setup()
   exec.exec("mount | grep /overlay");
 
