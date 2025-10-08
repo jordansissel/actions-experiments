@@ -19,7 +19,7 @@ class Cow {
       await this.#overlay(source_path);
     }
 
-    for (s of ["/tmp", "/dev", "/dev/pts", "/dev/console", "/var/cache", "/etc/resolv.conf"]) {
+    for (const s of ["/tmp", "/dev", "/dev/pts", "/dev/console", "/var/cache", "/etc/resolv.conf"]) {
       const p = path.join(this.root, s);
       if (s === "/tmp") {
         await this.#mkdirP(p);
