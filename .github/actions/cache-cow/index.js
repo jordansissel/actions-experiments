@@ -46,12 +46,13 @@ class Cow {
           await this.#bind(s);
         } else if (resolv.isSymbolicLink()) {
           // Mount the linked location. Probably /run/systemd/resolv/stub-resolv.conf
-          const link = await fs.readlink(resolv);
+          const link = await fs.readlink(s);
           await this.#mkdirP(path.join(this.root, path.basename(link)));
 
           // For a single file bind mount, the file must exist... so let's create it.
           const fd = await fs.open(path.join(this.root, link), "a");
           await fd.close()
+
           await this.#bind(link, path.join(this.root, link));
         }
       }
