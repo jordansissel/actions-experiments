@@ -98,6 +98,7 @@ class Cow {
 
   async #bind(source_path) {
     const mount_point = path.join(this.root, source_path)
+    await this.#mkdirP(mount_point);
     await this.#sudo("mount", ["-t", "bind", source_path, mount_point])
     this.mounts.push(mount_point);
   }
