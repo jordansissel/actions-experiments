@@ -82,7 +82,7 @@ function main() {
   const paths = ["/usr", "/etc", "/var/lib"];
   const cow = new Cow(paths);
   cow.setup()
-  exec.exec("mount | grep /overlay");
+  exec.exec("sh", ["-c", "mount | grep /overlay"]);
 
   console.log("Script: ", core.getInput("run"));
   cow.teardown()
