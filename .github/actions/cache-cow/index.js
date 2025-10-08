@@ -83,8 +83,8 @@ class Cow {
 
   #exec(command, args, options) {
     console.log(`exec: ${[command].concat(args).join(" ")}`);
-    return Promise.resolve()
-    //return exec.exec(command, args, options = {})
+    //return Promise.resolve()
+    return exec.exec(command, args, options = {})
   }
 
   async #sudo(command, args, options = {}) {
