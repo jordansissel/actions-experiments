@@ -45,8 +45,8 @@ class Cow {
           // Inside docker, /etc/resolv.conf is often mounted from the outside.
           await this.#bind(s);
         } else if (resolv.isSymbolicLink()) {
-          // Mount the linked location. Probably /run/systemd/resolv/stub-resolv.conf
-          const link = await fs.readlink(s);
+          // /etc/resolv.conf is a symlink. Let's mount the linked location. It's probably /run/systemd/resolv/stub-resolv.conf
+          const link = await fs.realpath(s);
           await this.#bind(link, path.join(this.root, link));
         }
       }
