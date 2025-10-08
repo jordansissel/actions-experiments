@@ -28,7 +28,7 @@ jobs:
         run: |
           sudo rm -f /whoa
           sudo mkdir -p /whoa/usr/bin
-          echo "echo 'Hello world'" > sudo tee /whoa/usr/bin/hello.sh
+          echo "echo 'Hello world'" | sudo tee -a /whoa/usr/bin/hello.sh
           sudo rsync -av /whoa/ /
 
       - name: Try it.
