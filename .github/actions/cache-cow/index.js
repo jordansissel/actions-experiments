@@ -1,7 +1,9 @@
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
+import * as cache from "@actions/cache";
 import * as fs from "node:fs/promises";
 import * as path from "path";
+import "crypto";
 
 class Cow {
   constructor(paths) {
@@ -64,7 +66,19 @@ class Cow {
   async runShell(script) {
     const userspec = [process.getuid(), process.getgid()].join(":")
 
-    await this.#sudo("chroot", ["--userspec", userspec, this.root, "bash", "-xc"], { input: script })
+    console.log("Script: ", script);
+    await this.#sudo("chroot", ["--userspec", userspec, this.root, "ls", "-l"]);
+    await this.#sudo("chroot", ["--userspec", userspec, this.root, "bash", "-x"], { input: script });
+
+    //await this.#sudo("find", [ path.join(this.base, "upper") ])
+  }
+
+  async capture() {
+    await this.#sudo("tar", [ "-Jcf", "cow.tar.xz", "-C", this.root ]);
+
+    const key = crypto.createHash("sha256")
+    key.update(core.getInput("run"));
+    cache.saveCache("cow.tar.xz", key.digest())
   }
 
 
@@ -86,10 +100,10 @@ class Cow {
   #exec(command, args, options) {
     //console.log(`exec: ${[command].concat(args).join(" ")}`);
     //return Promise.resolve()
-    return exec.exec(command, args, options = {})
+    return exec.exec(command, args, options)
   }
 
-  async #sudo(command, args, options = {}) {
+  async #sudo(command, args, options) {
     const cmd = [command].concat(args)
     await this.#exec("sudo", cmd, options)
   }
@@ -151,7 +165,14 @@ async function main() {
   const cow = new Cow(paths);
   await cow.setup()
 
-  await cow.runShell(core.getInput("run"))
+  try {
+    await cow.runShell(core.getInput("run"))
+
+    await cow.capture()
+  } catch (error) {
+    console.error("Script failed", error);
+  }
+
   await cow.teardown()
 }
 
