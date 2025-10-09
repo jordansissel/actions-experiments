@@ -23,12 +23,16 @@ class Cow {
   }
 
   async run() {
-    const restore = await cache.restoreCache(["cow.tar.xz"], this.cache_key);
-    if (restore !== undefined) {
-      console.log(`Extracting COW... (Cache COW hit on key ${restore})`);
+    // restoreCache checks for GITHUB_SERVER_URL anyway, then retries for
+    // whatever reason if it's not present... skip that :)
+    if ("GITHUB_SERVER_URL" in process.env) {
+      const restore = await cache.restoreCache(["cow.tar.xz"], this.cache_key);
+      if (restore !== undefined) {
+        console.log(`Extracting COW... (Cache COW hit on key ${restore})`);
 
-      await this.#sudo("tar", [ "-Jvxf", "cow.tar.xz", "-C", "/" ]);
-      return
+        await this.#sudo("tar", [ "-Jvxf", "cow.tar.xz", "-C", "/" ]);
+        return
+      }
     }
 
     await this.#setup()
@@ -108,9 +112,11 @@ class Cow {
   async #runShell() {
     const userspec = [process.getuid(), process.getgid()].join(":")
 
-    # Try to speed things up by removing package processes which are unnecessary on short-lived CI workers.
-    # Such as: manpage db updates, package docs, etc.
-    await this.#sudo("bash", ["-x", "${GITHUB_ACTION_PATH}/no-docs.sh"]);
+    let action_path = "GITHUB_ACTION_PATH" in process.env ? process.env["GITHUB_ACTION_PATH"] : import.meta.dirname;
+
+    // Try to speed things up by removing package processes which are unnecessary on short-lived CI workers.
+    // Such as: manpage db updates, package docs, etc.
+    await this.#sudo("bash", ["-x", path.join(action_path, "no-docs.sh"), "setup"]);
 
     await this.#sudo("chroot", ["--userspec", userspec, this.root, "bash", "-ex"], { input: this.script, silent: false });
 
@@ -120,8 +126,12 @@ class Cow {
   async #capture() {
     await this.#sudo("tar", [ "-Jcf", "cow.tar.xz", "-C", path.join(this.base, "upper"), "." ]);
 
-    console.log("Uploading captured changes to the cache.");
-    await cache.saveCache(["cow.tar.xz"], this.cache_key);
+    // restoreCache checks for GITHUB_SERVER_URL anyway, then retries for
+    // whatever reason if it's not present... skip that :)
+    if ("GITHUB_SERVER_URL" in process.env) {
+      console.log("Uploading captured changes to the cache.");
+      await cache.saveCache(["cow.tar.xz"], this.cache_key);
+    }
   }
 
   async #rootSymlinks() {
@@ -145,7 +155,8 @@ class Cow {
     }
 
     if (!("silent" in options)) {
-      options.silent = true
+      // Default silent = true unless RUNNER_DEBUG is in env
+      options.silent = !("RUNNER_DEBUG" in process.env);
     }
 
     //console.log(`exec: ${[command].concat(args).join(" ")}`);
