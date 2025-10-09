@@ -115,6 +115,11 @@ class Cow {
 
     let action_path = "GITHUB_ACTION_PATH" in process.env ? process.env["GITHUB_ACTION_PATH"] : import.meta.dirname;
 
+    if (path.basename(action_path) === "dist") {
+      // Go up one directory if running from 'dist' (rollupjs's build output)
+      action_path = path.dirname(action_path);
+    }
+
     // Try to speed things up by removing package processes which are unnecessary on short-lived CI workers.
     // Such as: manpage db updates, package docs, etc.
     console.log("> Configuring apt/dpkg to reduce work (no manpage database, less docs/manpage files)")
