@@ -116,11 +116,11 @@ class Cow {
 
     // Try to speed things up by removing package processes which are unnecessary on short-lived CI workers.
     // Such as: manpage db updates, package docs, etc.
+    console.log("> Configuring apt/dpkg to reduce work (no manpage database, less docs/manpage files)")
     await this.#sudo("bash", ["-x", path.join(action_path, "no-docs.sh"), "setup"]);
 
+    console.log("Running script given as `run` input");
     await this.#sudo("chroot", ["--userspec", userspec, this.root, "bash", "-ex"], { input: this.script, silent: false });
-
-    //await this.#sudo("find", [ path.join(this.base, "upper") ])
   }
 
   async #capture() {
