@@ -12,7 +12,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - run: env
-      env: 
-        inputs: ${{ toJSON(inputs.*) }}
-        inpuys2: ${{ toJSON(inputs) }}
+    - run: |
+        set -x
+        ${inputs.run}
