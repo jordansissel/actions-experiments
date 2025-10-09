@@ -14,4 +14,4 @@ jobs:
     steps:
     - run: |
         set -x
-        ${inputs.run}
+        ${{ inputs.run }}
