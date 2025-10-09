@@ -139,7 +139,7 @@ class Cow {
       await cache.saveCache(["cow.tar.xz"], this.cache_key);
 
       const artifact = new DefaultArtifactClient();
-      await artifact.uploadArtifact("cow.tar.xz", ["cow.tar.xz"]);
+      await artifact.uploadArtifact("cow.tar.xz", ["cow.tar.xz"], ".");
     }
   }
 
