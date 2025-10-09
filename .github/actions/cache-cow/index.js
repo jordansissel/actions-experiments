@@ -108,6 +108,10 @@ class Cow {
   async #runShell() {
     const userspec = [process.getuid(), process.getgid()].join(":")
 
+    # Try to speed things up by removing package processes which are unnecessary on short-lived CI workers.
+    # Such as: manpage db updates, package docs, etc.
+    await this.#sudo("bash", ["-x", "${GITHUB_ACTION_PATH}/no-docs.sh"]);
+
     await this.#sudo("chroot", ["--userspec", userspec, this.root, "bash", "-ex"], { input: this.script, silent: false });
 
     //await this.#sudo("find", [ path.join(this.base, "upper") ])
