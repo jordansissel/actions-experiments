@@ -1,7 +1,7 @@
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import * as cache from "@actions/cache";
-import * as artifact from "@actions/artifact";
+import { DefaultArtifactClient} from "@actions/artifact";
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import * as crypto from "node:crypto";
@@ -137,6 +137,8 @@ class Cow {
     if ("GITHUB_SERVER_URL" in process.env) {
       console.log("Uploading captured changes to the cache.");
       await cache.saveCache(["cow.tar.xz"], this.cache_key);
+
+      const artifact = new DefaultArtifactClient();
       await artifact.uploadArtifact("cow.tar.xz", ["cow.tar.xz"]);
     }
   }
