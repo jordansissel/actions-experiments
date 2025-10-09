@@ -108,8 +108,7 @@ class Cow {
   async #runShell() {
     const userspec = [process.getuid(), process.getgid()].join(":")
 
-    console.log("Script: ", this.script);
-    await this.#sudo("chroot", ["--userspec", userspec, this.root, "bash", "-x"], { input: this.script, silent: false });
+    await this.#sudo("chroot", ["--userspec", userspec, this.root, "bash", "-ex"], { input: this.script, silent: false });
 
     //await this.#sudo("find", [ path.join(this.base, "upper") ])
   }
