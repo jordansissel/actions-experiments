@@ -1,0 +1,33 @@
+name: cache testing 
+
+on:
+  workflow_dispatch:
+
+jobs:
+  example:
+    name: testing
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Cache
+      uses: actions/cache
+      id: cache
+      with:
+        path: |
+          ./cacheme
+        key: test
+
+    - name: Generate
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+          mkdir ./cacheme
+          seq 10 > ./cacheme/seq.txt
+          sleep 10
+
+    - name: Check it
+      run: |
+          wc -l ./cacheme/seq.txt
+          echo
+          cat ./cacheme/seq.txt
+
+
